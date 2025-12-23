@@ -4,7 +4,7 @@ interface Env {
 
 // 简单内存缓存，减少数据库查询
 const cache = new Map<string, { data: any; timestamp: number }>();
-const CACHE_TTL = 60 * 1000; // 60秒缓存
+const CACHE_TTL = 5 * 1000; // 5秒缓存
 
 export const onRequestGet = async ({ env }: { env: Env }) => {
   try {

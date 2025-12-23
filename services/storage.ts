@@ -38,7 +38,7 @@ export interface UserPreferences {
 
 const DEFAULT_PREFS: UserPreferences = {
   cardOpacity: 0.1,
-  themeColor: "#6366f1",
+  themeColor: "#6280a3",
   themeMode: ThemeMode.Dark,
 };
 
@@ -107,7 +107,6 @@ const tryRefreshToken = async (): Promise<string | null> => {
       _accessToken = null;
       localStorage.removeItem(AUTH_KEYS.ACCESS_TOKEN);
       localStorage.removeItem(AUTH_KEYS.TOKEN_EXPIRY);
-      // 刷新令牌失败，也清除登出标记
       localStorage.removeItem(AUTH_KEYS.USER_LOGGED_OUT);
     }
     return null;
@@ -130,13 +129,11 @@ const ensureAccessToken = async (): Promise<string | null> => {
       return _accessToken;
     }
   }
-  // 只有在本地存储中有令牌信息时才尝试刷新令牌
-  // 这可以防止在无痕模式下自动登录
+
   if (typeof window !== "undefined") {
     const storedToken = localStorage.getItem(AUTH_KEYS.ACCESS_TOKEN);
     const storedExpiry = localStorage.getItem(AUTH_KEYS.TOKEN_EXPIRY);
 
-    // 只有在本地存储中有令牌信息时才尝试刷新令牌
     if (storedToken && storedExpiry) {
       if (_isRefreshing)
         return new Promise((resolve) => _refreshSubscribers.push(resolve));
@@ -148,7 +145,6 @@ const ensureAccessToken = async (): Promise<string | null> => {
     }
   }
 
-  // 没有本地令牌信息，不尝试刷新
   return null;
 };
 
@@ -157,33 +153,26 @@ const ensureAccessToken = async (): Promise<string | null> => {
 export const storageService = {
   init: () => {
     if (typeof window !== "undefined") {
-      // 检查用户是否已主动登出
       const userLoggedOut = localStorage.getItem(AUTH_KEYS.USER_LOGGED_OUT);
       if (userLoggedOut === "true") {
-        // 用户已主动登出，不尝试自动刷新令牌
         return;
       }
 
       const storedToken = localStorage.getItem(AUTH_KEYS.ACCESS_TOKEN);
       const storedExpiry = localStorage.getItem(AUTH_KEYS.TOKEN_EXPIRY);
 
-      // 只有在本地存储中有令牌信息时才尝试刷新令牌
-      // 这可以防止在无痕模式下自动登录
       if (storedToken && storedExpiry) {
         if (parseInt(storedExpiry, 10) <= new Date().getTime()) {
           tryRefreshToken();
         }
       }
 
-      // 设置在线状态监听
       storageService._setupOnlineListener();
 
-      // 检查是否有待同步的数据
       if (storageService.checkGlobalDirtyState()) {
         storageService._pendingSync = true;
         storageService.notify("info", "You have unsynced changes. Syncing...");
 
-        // 如果在线，立即尝试同步
         if (storageService._isOnline) {
           storageService.syncPendingChanges();
         }
@@ -210,7 +199,6 @@ export const storageService = {
     _syncStatusListeners.forEach((l) => l(isSyncing));
   },
   checkGlobalDirtyState: () => {
-    // 检查本地数据是否与云端同步
     const localCategories = safeJsonParse(
       localStorage.getItem(LS_KEYS.CATEGORIES),
       null
@@ -218,25 +206,22 @@ export const storageService = {
     const localBackground = localStorage.getItem(LS_KEYS.BACKGROUND);
     const localPrefs = safeJsonParse(localStorage.getItem(LS_KEYS.PREFS), null);
 
-    // 如果本地有数据但未同步到云端，返回true
     return (
       (localCategories || localBackground || localPrefs) &&
       !storageService._isSynced
     );
   },
 
-  _isSynced: false, // 标记本地数据是否已同步到云端
-  _isOnline: navigator.onLine, // 跟踪在线状态
-  _pendingSync: false, // 标记是否有待同步的数据
+  _isSynced: false,
+  _isOnline: navigator.onLine,
+  _pendingSync: false,
 
-  // 设置在线状态监听
   _setupOnlineListener: () => {
     if (typeof window !== "undefined") {
       const updateOnlineStatus = () => {
         const wasOffline = !storageService._isOnline;
         storageService._isOnline = navigator.onLine;
 
-        // 如果从离线变为在线，尝试同步待处理的数据
         if (
           wasOffline &&
           storageService._isOnline &&
@@ -264,7 +249,6 @@ export const storageService = {
         const expiryTime = new Date().getTime() + 24 * 60 * 60 * 1000;
         localStorage.setItem(AUTH_KEYS.ACCESS_TOKEN, data.accessToken);
         localStorage.setItem(AUTH_KEYS.TOKEN_EXPIRY, expiryTime.toString());
-        // 清除登出标记
         localStorage.removeItem(AUTH_KEYS.USER_LOGGED_OUT);
         return true;
       }
@@ -286,7 +270,6 @@ export const storageService = {
       if (typeof window !== "undefined") {
         localStorage.removeItem(AUTH_KEYS.ACCESS_TOKEN);
         localStorage.removeItem(AUTH_KEYS.TOKEN_EXPIRY);
-        // 添加一个标记，表示用户已主动登出
         localStorage.setItem(AUTH_KEYS.USER_LOGGED_OUT, "true");
       }
     }
@@ -344,7 +327,7 @@ export const storageService = {
       cloudData?.prefs ||
       safeJsonParse(localStorage.getItem(LS_KEYS.PREFS), DEFAULT_PREFS);
 
-    // 💡 原始代码中的背景图和 categories 防护逻辑
+    // 背景图和 categories 防护逻辑
     if (!Array.isArray(finalCategories)) finalCategories = INITIAL_CATEGORIES;
     if (
       typeof finalBackground === "string" &&
@@ -363,6 +346,25 @@ export const storageService = {
     }
     if (typeof finalBackground !== "string")
       finalBackground = DEFAULT_BACKGROUND;
+
+    // 验证finalPrefs是否为有效的UserPreferences对象
+    if (!finalPrefs || typeof finalPrefs !== "object") {
+      finalPrefs = DEFAULT_PREFS;
+    } else {
+      // 确保所有必需属性都存在
+      if (typeof finalPrefs.cardOpacity !== "number") {
+        finalPrefs.cardOpacity = DEFAULT_PREFS.cardOpacity;
+      }
+      if (finalPrefs.themeColor && typeof finalPrefs.themeColor !== "string") {
+        finalPrefs.themeColor = DEFAULT_PREFS.themeColor;
+      }
+      if (
+        !finalPrefs.themeMode ||
+        !Object.values(ThemeMode).includes(finalPrefs.themeMode)
+      ) {
+        finalPrefs.themeMode = DEFAULT_PREFS.themeMode;
+      }
+    }
 
     safeLocalStorageSet(LS_KEYS.CATEGORIES, finalCategories);
     safeLocalStorageSet(LS_KEYS.BACKGROUND, finalBackground);
@@ -385,7 +387,6 @@ export const storageService = {
       return;
     }
 
-    // 如果不强制同步且离线，标记为待同步
     if (!force && !storageService._isOnline) {
       storageService._isSynced = false;
       storageService._pendingSync = true;
@@ -394,7 +395,8 @@ export const storageService = {
 
     // 防抖逻辑（除非强制同步）
     const now = Date.now();
-    if (!force && now - storageService._lastSaveTime < 1000) return;
+    const debounceTime = type === "prefs" ? 300 : 1000;
+    if (!force && now - storageService._lastSaveTime < debounceTime) return;
     storageService._lastSaveTime = now;
 
     storageService.notifySyncStatus(true);

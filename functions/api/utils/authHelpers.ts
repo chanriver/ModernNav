@@ -1,6 +1,6 @@
 // 认证相关的工具函数
 
-const ACCESS_TTL = 30 * 60 * 1000; // 30分钟
+const ACCESS_TTL = 60 * 60 * 1000; // 60分钟
 const REFRESH_TTL = 7 * 24 * 60 * 60 * 1000; // 7天
 
 // 请求限制配置
@@ -15,7 +15,7 @@ const ERROR_MESSAGES = {
   INVALID_CREDENTIALS: "Invalid credentials",
   SERVER_ERROR: "Server error, please try again later",
   INVALID_DATA: "Invalid data format",
-  DATA_NOT_FOUND: "Requested data not found"
+  DATA_NOT_FOUND: "Requested data not found",
 };
 
 // 加密助手
@@ -59,7 +59,8 @@ export async function generateToken(
 
 // Cookie 助手
 export function respondWithCookie(body: any, token: string, clear = false) {
-  const cookie = "refresh_token=" +
+  const cookie =
+    "refresh_token=" +
     (clear ? "" : token) +
     "; HttpOnly; Secure; SameSite=Strict; Path=/api/auth; Max-Age=" +
     (clear ? 0 : REFRESH_TTL / 1000);
@@ -72,7 +73,10 @@ export function respondWithCookie(body: any, token: string, clear = false) {
 export class RateLimiter {
   private store: Map<string, { count: number; resetTime: number }> = new Map();
 
-  constructor(private maxRequests: number = RATE_LIMIT_MAX_REQUESTS, private windowMs: number = RATE_LIMIT_WINDOW) {}
+  constructor(
+    private maxRequests: number = RATE_LIMIT_MAX_REQUESTS,
+    private windowMs: number = RATE_LIMIT_WINDOW
+  ) {}
 
   isAllowed(identifier: string): boolean {
     const now = Date.now();
@@ -99,9 +103,17 @@ export class RateLimiter {
 
 // 获取客户端IP助手
 export function getClientIP(request: Request): string {
-  return request.headers.get("CF-Connecting-IP") ||
-         request.headers.get("X-Forwarded-For") ||
-         "unknown";
+  return (
+    request.headers.get("CF-Connecting-IP") ||
+    request.headers.get("X-Forwarded-For") ||
+    "unknown"
+  );
 }
 
-export { ACCESS_TTL, REFRESH_TTL, RATE_LIMIT_WINDOW, RATE_LIMIT_MAX_REQUESTS, ERROR_MESSAGES };
+export {
+  ACCESS_TTL,
+  REFRESH_TTL,
+  RATE_LIMIT_WINDOW,
+  RATE_LIMIT_MAX_REQUESTS,
+  ERROR_MESSAGES,
+};

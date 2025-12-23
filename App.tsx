@@ -178,9 +178,14 @@ const App: React.FC = () => {
   };
 
   const toggleTheme = () => {
-    setThemeMode((prev) =>
-      prev === ThemeMode.Dark ? ThemeMode.Light : ThemeMode.Dark
-    );
+    const newTheme =
+      themeMode === ThemeMode.Dark ? ThemeMode.Light : ThemeMode.Dark;
+    setThemeMode(newTheme);
+    storageService.savePreferences({
+      cardOpacity,
+      themeColor,
+      themeMode: newTheme,
+    });
   };
 
   const handleMainCategoryClick = (cat: Category) => {
