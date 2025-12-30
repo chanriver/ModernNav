@@ -558,7 +558,7 @@ const App: React.FC = () => {
                     opacity={cardOpacity}
                     themeMode={themeMode}
                     onClick={() => window.open(link.url, "_blank")}
-                    className="h-32 flex flex-col items-center justify-center text-center p-4 relative group animate-card-enter"
+                    className="h-40 flex flex-col items-center justify-center text-center p-5 relative group animate-card-enter"
                     style={{
                       animationFillMode: 'backwards'
                     }}
@@ -569,14 +569,14 @@ const App: React.FC = () => {
                     }
                   >
                     <div
-                      className={`mb-2 transition-transform duration-300 group-hover:scale-110 group-hover:drop-shadow-[0_0_8px_rgba(255,255,255,0.3)] flex items-center justify-center h-6 w-6 ${
+                      className={`mb-3 transition-transform duration-300 group-hover:scale-110 group-hover:drop-shadow-[0_0_8px_rgba(255,255,255,0.3)] flex items-center justify-center h-10 w-10 ${
                         isDark ? "text-white/90" : "text-slate-700"
                       }`}
                     >
                       <SmartIcon 
                         icon={link.icon} 
-                        size={24} 
-                        imgClassName="w-6 h-6 object-contain drop-shadow-md rounded-md"
+                        size={36} 
+                        imgClassName="w-9 h-9 object-contain drop-shadow-md rounded-md"
                       />
                     </div>
                     <span
