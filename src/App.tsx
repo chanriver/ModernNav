@@ -558,7 +558,7 @@ const App: React.FC = () => {
                     opacity={cardOpacity}
                     themeMode={themeMode}
                     onClick={() => window.open(link.url, "_blank")}
-                    className="h-24 flex flex-col items-center justify-center text-center p-2 relative group animate-card-enter"
+                    className="h-32 flex flex-col items-center justify-center text-center p-4 relative group animate-card-enter"
                     style={{
                       animationFillMode: 'backwards'
                     }}
@@ -580,9 +580,9 @@ const App: React.FC = () => {
                       />
                     </div>
                     <span
-                      className={`text-[12px] font-medium truncate w-full px-1 transition-colors duration-300 ${
+                      className={`text-[15px] font-semibold truncate w-full px-1 transition-colors duration-300 ${
                         isDark
-                          ? "text-white/80 group-hover:text-white"
+                          ? "text-white/85 group-hover:text-white"
                           : "text-slate-800"
                       }`}
                     >
