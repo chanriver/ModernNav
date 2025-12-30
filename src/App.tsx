@@ -558,7 +558,7 @@ const App: React.FC = () => {
                     opacity={cardOpacity}
                     themeMode={themeMode}
                     onClick={() => window.open(link.url, "_blank")}
-                    className="h-40 flex flex-col items-center justify-center text-center p-5 relative group animate-card-enter"
+                    className="h-32 flex flex-col items-center justify-center text-center p-5 relative group animate-card-enter"
                     style={{
                       animationFillMode: 'backwards'
                     }}
