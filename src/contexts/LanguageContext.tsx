@@ -1,6 +1,6 @@
 import React, { createContext, useContext, useState, useEffect } from "react";
 
-type Language = "en" | "zh";
+type Language = "zh";
 
 interface LanguageContextType {
   language: Language;
@@ -9,121 +9,7 @@ interface LanguageContextType {
 }
 
 const translations = {
-  en: {
-    // App
-    settings: "Settings",
-    friendly_links: "Friendly Links",
-    about_us: "GitHub",
-    copyright: "Copyright",
-    powered_by: "Powered by",
-
-    // Search
-    search_placeholder: "Search with {engine}...",
-
-    // Auth
-    admin_access: "Admin Access",
-    enter_code_msg: "Please enter the access code to manage dashboard.",
-    default_code: "Default Code: admin",
-    unlock_btn: "Unlock Dashboard",
-    cancel: "Cancel",
-    incorrect_code: "Incorrect Access Code",
-    logout: "Logout",
-    session_expired: "Session expired due to inactivity. Please login again.",
-
-    // Dashboard Header
-    dashboard_manage: "Dashboard Management",
-
-    // Tabs
-    tab_content: "Content",
-    tab_appearance: "Appearance",
-    tab_data: "Data",
-    tab_security: "Security",
-
-    // Security Tab
-    access_control: "Access Control",
-    access_desc: "Update the access code used to unlock this panel.",
-    current_code: "Current Code",
-    new_code: "New Code",
-    confirm_code: "Confirm New Code",
-    show_codes: "Show Codes",
-    hide_codes: "Hide Codes",
-    update_code_btn: "Update Code",
-    code_updated: "Access Code updated successfully.",
-    code_mismatch: "New codes do not match.",
-    code_length_err: "New code must be at least 4 characters.",
-    current_code_err: "Current Access Code is incorrect.",
-
-    // Data Tab
-    backup_config: "Backup Configuration",
-    backup_desc: "Export your categories and links to a JSON file.",
-    download_backup: "Download Backup File",
-    restore_config: "Restore Configuration",
-    restore_desc: "Import categories and links from a JSON file.",
-    select_import: "Select File to Import",
-    import_success: "Configuration loaded successfully!",
-    import_error:
-      "Failed to import. Please check if the file is a valid JSON backup.",
-    data_risk_title: "Cloud Persistence",
-    data_risk_desc:
-      "Changes are securely stored in Cloudflare D1. Use local backups for extra peace of mind.",
-    last_backup: "Last Backup: {time}",
-    never_backup: "Never",
-
-    // Appearance Tab
-    background_settings: "Background",
-    background_desc: "Customize image, blur, and transparency.",
-    bg_url_label: "Image URL",
-    bg_url_placeholder: "https://example.com/image.jpg",
-    update_bg_btn: "Update",
-    reset_bg_btn: "Reset Default",
-    bg_updated: "Appearance settings updated!",
-    label_blur: "Background Blur",
-    label_opacity: "Card Opacity",
-    label_theme_color: "Theme Color",
-    btn_auto_extract: "Auto Extract",
-    btn_custom_color: "Custom",
-    theme_updated: "Theme color updated!",
-    extracting_color: "Extracting color...",
-
-    // Manager UI
-    sidebar_categories: "Categories",
-    search_links_placeholder: "Search links...",
-    add_category_placeholder: "New Category",
-    add_category_btn: "Add",
-    delete_cat_confirm: "Delete category '{name}' and all its links?",
-    edit_category_title: "Rename Category",
-
-    // Sub-menu / Groups
-    add_submenu: "Add Sub-menu",
-    add_link_directly: "Add Link Directly",
-    submenu_title: "Sub-menu Title",
-    new_submenu_placeholder: "e.g., Development Tools",
-    delete_submenu_confirm: "Delete sub-menu '{name}'?",
-    edit_submenu: "Edit Sub-menu",
-
-    // Links Tab
-    add_new_link: "Add Link",
-    no_links: "No links in this group.",
-    no_links_search: "No links match your search.",
-    no_submenus: "No sub-menus yet. Add a sub-menu or add links directly.",
-
-    // Link Form
-    label_category: "Category",
-    label_icon: "Icon",
-    icon_placeholder: "Name (Github), Emoji (🚀) or URL",
-    label_title: "Title",
-    title_placeholder: "My Link",
-    label_url: "URL",
-    url_placeholder: "https://example.com",
-    label_desc: "Description",
-    desc_placeholder: "Optional description",
-    add_link_card: "Save Link",
-    update_link_card: "Update Link",
-
-    // Sync
-    syncing_msg: "Syncing changes to cloud...",
-  },
-  zh: {
+    zh: {
     // App
     settings: "设置",
     friendly_links: "友情链接",
@@ -245,19 +131,7 @@ const LanguageContext = createContext<LanguageContextType | undefined>(
 export const LanguageProvider: React.FC<{ children: React.ReactNode }> = ({
   children,
 }) => {
-  const [language, setLanguage] = useState<Language>("en");
-
-  useEffect(() => {
-    const savedLang = localStorage.getItem("modernNavLanguage") as Language;
-    if (savedLang && (savedLang === "en" || savedLang === "zh")) {
-      setLanguage(savedLang);
-    }
-  }, []);
-
-  const handleSetLanguage = (lang: Language) => {
-    setLanguage(lang);
-    localStorage.setItem("modernNavLanguage", lang);
-  };
+  const [language] = useState<Language>("zh");
 
   const t = (key: string, params?: Record<string, string>) => {
     let text = (translations[language] as any)[key] || key;
@@ -271,7 +145,7 @@ export const LanguageProvider: React.FC<{ children: React.ReactNode }> = ({
 
   return (
     <LanguageContext.Provider
-      value={{ language, setLanguage: handleSetLanguage, t }}
+      value={{ language: "zh", setLanguage: () => {}, t }}
     >
       {children}
     </LanguageContext.Provider>
