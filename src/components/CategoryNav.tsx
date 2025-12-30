@@ -180,7 +180,7 @@ export const CategoryNav: React.FC<CategoryNavProps> = ({
                       isActive
                     )}`}
                   >
-                    <span className="truncate max-w-[120px] relative z-10">
+                    <span className="truncate max-w-[180px] relative z-10 text-xl font-bold">
                       {cat.title}
                     </span>
                     {!hasSingleDefault && (
@@ -210,7 +210,7 @@ export const CategoryNav: React.FC<CategoryNavProps> = ({
                                   activeSubCategoryId === sub.id
                               )}
                             >
-                              <span className="truncate">{sub.title}</span>
+                              <span className="truncate text-lg">{sub.title}</span>
                               {activeCategory === cat.id &&
                                 activeSubCategoryId === sub.id && (
                                   <div className="w-1 h-1 rounded-full bg-white shadow-sm"></div>
