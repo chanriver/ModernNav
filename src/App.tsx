@@ -553,42 +553,78 @@ const App: React.FC = () => {
               >
                 {visibleSubCategory.items.map((link, index) => (
                   <GlassCard
-                    key={link.id}
-                    hoverEffect={true}
-                    opacity={cardOpacity}
-                    themeMode={themeMode}
-                    onClick={() => window.open(link.url, "_blank")}
-                    className="h-32 flex flex-col items-center justify-center text-center p-5 relative group animate-card-enter"
-                    style={{
-                      animationFillMode: 'backwards'
-                    }}
-                    title={
-                      link.description
-                        ? `${link.description}\n${link.url}`
-                        : `${link.title}\n${link.url}`
-                    }
-                  >
-                    <div
-                      className={`mb-3 transition-transform duration-300 group-hover:scale-110 group-hover:drop-shadow-[0_0_8px_rgba(255,255,255,0.3)] flex items-center justify-center h-10 w-10 ${
-                        isDark ? "text-white/90" : "text-slate-700"
-                      }`}
-                    >
-                      <SmartIcon 
-                        icon={link.icon} 
-                        size={36} 
-                        imgClassName="w-9 h-9 object-contain drop-shadow-md rounded-md"
-                      />
-                    </div>
-                    <span
-                      className={`text-[15px] font-semibold truncate w-full px-1 transition-colors duration-300 ${
-                        isDark
-                          ? "text-white/85 group-hover:text-white"
-                          : "text-slate-800"
-                      }`}
-                    >
-                      {link.title}
-                    </span>
-                  </GlassCard>
+  key={link.id}
+  hoverEffect={true}
+  opacity={cardOpacity}
+  themeMode={themeMode}
+  onClick={() => window.open(link.url, "_blank")}
+  className="
+    h-14
+    px-3
+    flex
+    items-center
+    gap-3
+    cursor-pointer
+    relative
+    group
+    animate-card-enter
+  "
+  style={{ animationFillMode: "backwards" }}
+  title={
+    link.description
+      ? `${link.description}\n${link.url}`
+      : `${link.title}\n${link.url}`
+  }
+>
+  {/* 左侧图标 */}
+  <div
+    className={`
+      flex
+      items-center
+      justify-center
+      h-9
+      w-9
+      rounded-lg
+      transition-transform
+      duration-300
+      group-hover:scale-110
+      ${isDark ? "text-white/90" : "text-slate-700"}
+    `}
+  >
+    <SmartIcon
+      icon={link.icon}
+      size={28}
+      imgClassName="w-7 h-7 object-contain drop-shadow-md rounded-md"
+    />
+  </div>
+
+  {/* 右侧文字 */}
+  <div className="flex flex-col justify-center min-w-0">
+    <span
+      className={`
+        text-[14px]
+        font-semibold
+        truncate
+        ${isDark ? "text-white" : "text-slate-800"}
+      `}
+    >
+      {link.title}
+    </span>
+
+    {link.description && (
+      <span
+        className={`
+          text-[11px]
+          truncate
+          ${isDark ? "text-white/50" : "text-slate-500"}
+        `}
+      >
+        {link.description}
+      </span>
+    )}
+  </div>
+</GlassCard>
+
                 ))}
               </div>
 
