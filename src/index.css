@@ -2,6 +2,13 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+@keyframes fadeInSlide {
+  from { opacity: 0; transform: translateY(10px); filter: blur(5px); }
+  to { opacity: 1; transform: translateY(0); filter: blur(0); }
+}
+.animate-poem-line {
+  animation: fadeInSlide 1.2s ease-out forwards;
+}
 @keyframes fade-in-up {
   from {
     opacity: 0;
@@ -12,7 +19,10 @@
     transform: translateY(0);
   }
 }
-
+/* index.css */
+.font-serif {
+  font-family: "Noto Serif SC", "Source Han Serif SC", "SimSun", serif;
+}
 .animate-fade-in {
   animation: fade-in-up 0.5s ease-out forwards;
 }
