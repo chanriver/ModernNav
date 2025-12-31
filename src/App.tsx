@@ -239,43 +239,62 @@ const App: React.FC = () => {
           <ConsoleLog />
         </div>
 
-        <main className="w-full pb-20 relative z-[10] space-y-8">
-          {visibleSubCategory ? (
-            <div key={visibleSubCategory.id}>
-              <div className="flex items-center gap-6 mb-8 mt-4">
-                <div className={`h-[2px] flex-1 bg-gradient-to-r from-transparent ${isDark ? "to-white/30" : "to-slate-400/40"}`} />
-                <h3 className={`text-lg md:text-xl font-black tracking-tight px-6 py-2 rounded-xl ${isDark ? "text-white bg-white/10" : "text-slate-900 bg-white/60 shadow-sm"}`}>
-                  {visibleSubCategory.title === "Default" ? visibleCategory?.title : visibleSubCategory.title}
-                </h3>
-                <div className={`h-[2px] flex-1 bg-gradient-to-l from-transparent ${isDark ? "to-white/30" : "to-slate-400/40"}`} />
-              </div>
+<main className="w-full pb-20 relative z-[10] space-y-8">
+  {visibleSubCategory ? (
+    <div key={visibleSubCategory.id}>
+      {/* 1. 修复：二级分类标题显示逻辑 */}
+      <div className="flex items-center gap-6 mb-8 mt-4">
+        <div className={`h-[2px] flex-1 bg-gradient-to-r from-transparent ${isDark ? "to-white/30" : "to-slate-400/40"}`} />
+        <h3 className={`text-lg md:text-xl font-black tracking-tight px-6 py-2 rounded-xl ${isDark ? "text-white bg-white/10" : "text-slate-900 bg-white/60 shadow-sm"}`}>
+          {/* 如果子分类名为 Default，则显示主分类名；否则显示子分类名 */}
+          {visibleSubCategory.title === "Default" || !visibleSubCategory.title 
+            ? visibleCategory?.title 
+            : visibleSubCategory.title}
+        </h3>
+        <div className={`h-[2px] flex-1 bg-gradient-to-l from-transparent ${isDark ? "to-white/30" : "to-slate-400/40"}`} />
+      </div>
 
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-                {visibleSubCategory.items.map((link) => (
-                  <GlassCard
-                    key={link.id}
-                    hoverEffect={true}
-                    opacity={cardOpacity}
-                    themeMode={themeMode}
-                    onClick={() => window.open(link.url, "_blank")}
-                    className="h-20 flex flex-row items-center px-5 gap-5 group animate-card-enter"
-                  >
-                    <div className="flex-shrink-0 transition-transform duration-300 group-hover:scale-110 flex items-center justify-center h-9 w-9">
-                      <SmartIcon icon={link.icon} size={36} imgClassName="w-9 h-9 object-contain drop-shadow-md rounded-lg" />
-                    </div>
-                    <div className="flex flex-col items-start overflow-hidden">
-                      <span className={`text-[16px] font-bold truncate w-full ${isDark ? "text-white group-hover:text-[var(--theme-primary)]" : "text-slate-800"}`}>
-                        {link.title}
-                      </span>
-                    </div>
-                  </GlassCard>
-                ))}
-              </div>
+      {/* 2. 修复：网格布局与悬停信息 */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        {visibleSubCategory.items.map((link) => (
+          <GlassCard
+            key={link.id}
+            // 修复：鼠标悬停时显示的完整信息 (原生 HTML title 提示)
+            title={`站点：${link.title}\n链接：${link.url}${link.description ? `\n简介：${link.description}` : ''}`}
+            hoverEffect={true}
+            opacity={cardOpacity}
+            themeMode={themeMode}
+            onClick={() => window.open(link.url, "_blank")}
+            className="h-20 flex flex-row items-center px-5 gap-5 group animate-card-enter cursor-pointer"
+          >
+            {/* 图标 */}
+            <div className="flex-shrink-0 transition-transform duration-300 group-hover:scale-110 flex items-center justify-center h-9 w-9">
+              <SmartIcon icon={link.icon} size={36} imgClassName="w-9 h-9 object-contain drop-shadow-md rounded-lg" />
             </div>
-          ) : (
-            <div className="text-center py-12 opacity-30">No sub-categories found.</div>
-          )}
-        </main>
+            {/* 标题 */}
+            <div className="flex flex-col items-start overflow-hidden">
+              <span className={`text-[16px] font-bold truncate w-full transition-colors ${isDark ? "text-white group-hover:text-[var(--theme-primary)]" : "text-slate-800"}`}>
+                {link.title}
+              </span>
+              {/* 如果你想在卡片上也显示一小段简介，可以取消下面注释 */}
+              {/* <span className="text-[10px] opacity-40 truncate w-full">{link.url}</span> */}
+            </div>
+          </GlassCard>
+        ))}
+      </div>
+
+      {/* 无内容占位 */}
+      {visibleSubCategory.items.length === 0 && (
+        <div className="text-center py-20 opacity-20 flex flex-col items-center gap-2">
+          <FolderOpen size={48} strokeWidth={1} />
+          <p>此分类下暂无剑谱（链接）</p>
+        </div>
+      )}
+    </div>
+  ) : (
+    <div className="text-center py-12 opacity-30">未找到对应分类</div>
+  )}
+</main>
       </div> {/* 此处闭合 Container */}
 
       {/* --- 浮动挂件：独立于容器之外 --- */}
