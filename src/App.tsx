@@ -582,7 +582,7 @@ const App: React.FC = () => {
             // 修改为 h-20 且 padding 增加，内容水平排列
             className="h-20 flex flex-row items-center px-5 gap-5 group animate-card-enter"
             style={{ animationFillMode: 'backwards' }}
-            title={`${link.title}\n${link.url}`}
+            
           >
             {/* 图标容器：尺寸加大 50% (24px -> 36px) */}
             <div
