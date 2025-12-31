@@ -574,6 +574,7 @@ const App: React.FC = () => {
         {visibleSubCategory.items.map((link) => (
           <GlassCard
             key={link.id}
+            title={link.description ? `${link.title}\n${link.description}` : link.title}
             hoverEffect={true}
             opacity={cardOpacity}
             themeMode={themeMode}
