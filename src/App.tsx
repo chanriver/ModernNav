@@ -654,27 +654,7 @@ const App: React.FC = () => {
     </div>
   )}
 </main>
-    {/* --- 新增：左右对称挂件 --- */}
-    
-   {/* 左侧：时钟 (无边框融入模式) */}
-<div className="hidden lg:flex fixed left-10 top-1/2 -translate-y-1/2 z-40">
-  <div className="group transition-all duration-700 hover:translate-x-3">
-    {/* 这里不再使用 GlassCard 的背景和边框，直接展示内容 */}
-    <div className="p-5 select-none">
-      <ClockWidget />
-    </div>
-  </div>
-</div>
-
-{/* 右侧：诗词 (无边框融入模式) */}
-<div className="hidden lg:flex fixed right-16 top-1/2 -translate-y-1/2 z-40 max-w-2xl text-right">
-  <div className="transition-transform duration-700 hover:-translate-x-4">
-    {/* 同样去掉边框背景，items-end 确保诗词靠右对齐更美观 */}
-    <div className="flex flex-col items-end">
-      <PoemWidget />
-    </div>
-  </div>
-</div>
+	</div>
 
       <SyncIndicator />
 
