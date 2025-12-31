@@ -17,6 +17,7 @@ export const GlassCard: React.FC<GlassCardProps> = ({
   opacity = 0.1,
   themeMode = ThemeMode.Dark,
   style,
+  title,
   ...props
 }) => {
   const isDark = themeMode === ThemeMode.Dark;
@@ -60,6 +61,7 @@ export const GlassCard: React.FC<GlassCardProps> = ({
     <div
       className={containerClasses}
       onClick={onClick}
+      title={title}
       style={{
         backgroundColor: baseColor,
         backdropFilter: `blur(${blurAmount}px) saturate(${saturation}%)`,
