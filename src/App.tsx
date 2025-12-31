@@ -543,7 +543,7 @@ const App: React.FC = () => {
         <section className="w-full mb-14 animate-fade-in-down relative z-[70] isolation-isolate">
           <SearchBar themeMode={themeMode} />
         </section>
-{/* 在 App.tsx 的 SearchBar 容器上方 */}
+{/* 在 App.tsx 的 SearchBar 容器下方 */}
 <div className="w-full flex flex-col items-center mb-10">
   {/* 名言组件 - 居中显示 */}
   <ConsoleLog />
@@ -574,7 +574,7 @@ const App: React.FC = () => {
         {visibleSubCategory.items.map((link) => (
           <GlassCard
             key={link.id}
-            title={link.description ? `${link.title}\n${link.description}` : link.title}
+            title={`${link.title}\n介绍：${link.description || '暂无简介'}\n链接：${link.url}`}
             hoverEffect={true}
             opacity={cardOpacity}
             themeMode={themeMode}
@@ -651,7 +651,7 @@ const App: React.FC = () => {
             <LinkIcon size={12} /> {t("friendly_links")}
           </a>
           <a
-            href="https://github.com/lyan0220"
+            href="https://github.com/chanriver"
             target="_blank"
             rel="noopener noreferrer"
             className="flex items-center gap-1.5 hover:text-[var(--theme-primary)] cursor-pointer transition-colors"
@@ -666,12 +666,12 @@ const App: React.FC = () => {
             <span className="opacity-80">{t("powered_by")}</span>
           </p>
           <a
-            href="https://github.com/lyan0220/ModernNav"
+            href="https://github.com/chanriver/ModernNav"
             target="_blank"
             rel="noopener noreferrer"
             className="ml-1 font-semibold hover:text-[var(--theme-primary)] transition-colors"
           >
-            Lyan
+            Chanriver
           </a>
         </div>
       </footer>
