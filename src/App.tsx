@@ -22,7 +22,8 @@ import { storageService, DEFAULT_BACKGROUND } from "./services/storage";
 import { getDominantColor } from "./utils/color";
 import { Category, ThemeMode } from "./types";
 import { useLanguage } from "./contexts/LanguageContext";
-
+import { ClockWidget } from './components/ClockWidget';
+import { PoemWidget } from './components/PoemWidget';
 const App: React.FC = () => {
   // State
   const [loading, setLoading] = useState(true);
