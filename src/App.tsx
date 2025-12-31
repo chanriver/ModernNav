@@ -560,9 +560,13 @@ const App: React.FC = () => {
       {/* 分类标题分割线 */}
       <div className="flex items-center gap-4 mb-6">
         <div className={`h-[1px] flex-1 bg-gradient-to-r from-transparent ${isDark ? "to-white/20" : "to-slate-400/30"}`}></div>
-        <h3 className={`text-[10px] font-bold uppercase tracking-[0.2em] px-2 ${isDark ? "text-white/50" : "text-slate-400"}`}>
-          {visibleSubCategory.title === "Default" ? visibleCategory?.title : visibleSubCategory.title}
-        </h3>
+        <h3 className={`text-sm font-bold uppercase tracking-wider px-4 py-1 rounded-full border ${
+  isDark 
+    ? "text-white/80 border-white/10 bg-white/5" 
+    : "text-slate-700 border-black/5 bg-black/5"
+}`}>
+  {visibleSubCategory.title === "Default" ? visibleCategory?.title : visibleSubCategory.title}
+</h3>
         <div className={`h-[1px] flex-1 bg-gradient-to-l from-transparent ${isDark ? "to-white/20" : "to-slate-400/30"}`}></div>
       </div>
 
