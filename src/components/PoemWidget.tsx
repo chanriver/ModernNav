@@ -1,22 +1,34 @@
 import React, { useState, useEffect } from 'react';
 
 export const PoemWidget: React.FC = () => {
-  const [poem, setPoem] = useState({ content: '正在寻觅诗句...', author: '', origin: '' });
+  const [poemData, setPoemData] = useState({ content: '', author: '', origin: '' });
+  const [displayLines, setDisplayLines] = useState<string[]>([]);
   const [loading, setLoading] = useState(false);
 
   const fetchPoem = async () => {
     setLoading(true);
     try {
-      // 使用今日诗词 API
       const response = await fetch('https://v1.jinrishici.com/all.json');
       const data = await response.json();
-      setPoem({
+      
+      // 处理诗句：按标点符号拆分成多行
+      const lines = data.content.split(/[，。？！；]/).filter((l: string) => l.trim().length > 0);
+      
+      setPoemData({
         content: data.content,
         author: data.author,
         origin: data.origin
       });
+      
+      // 重置并逐句显示
+      setDisplayLines([]);
+      lines.forEach((line: string, index: number) => {
+        setTimeout(() => {
+          setDisplayLines(prev => [...prev, line]);
+        }, index * 800); // 每隔 800ms 输出下一句
+      });
     } catch (error) {
-      setPoem({ content: '此间无声，唯有清风。', author: '无名', origin: '自然' });
+      console.error("获取诗词失败");
     } finally {
       setLoading(false);
     }
@@ -28,28 +40,35 @@ export const PoemWidget: React.FC = () => {
 
   return (
     <div 
-      className="flex flex-col items-start gap-2 cursor-pointer group/poem"
+      className="flex flex-col items-start gap-4 cursor-pointer select-none group"
       onClick={fetchPoem}
-      title="点击刷新诗词"
     >
-      {/* 诗词正文 */}
-      <div className={`text-sm font-medium leading-relaxed transition-opacity duration-300 ${loading ? 'opacity-30' : 'opacity-100'}`}>
-        {poem.content}
-      </div>
-      
-      {/* 作者信息 */}
-      <div className="flex items-center gap-2">
-        <div className="w-4 h-[1px] bg-[var(--theme-primary)] opacity-50"></div>
-        <span className="text-[10px] opacity-40 font-bold tracking-wider">
-          {poem.author} · 《{poem.origin}》
-        </span>
+      {/* 诗词正文：逐行渲染 */}
+      <div className="space-y-3">
+        {displayLines.map((line, index) => (
+          <div 
+            key={index}
+            className="text-2xl md:text-3xl font-serif text-white/90 tracking-[0.15em] animate-in fade-in slide-in-from-bottom-4 duration-1000 fill-mode-forwards"
+            style={{ 
+              textShadow: '0 2px 10px rgba(0,0,0,0.5)', // 确保在亮色背景下也清晰
+              fontFamily: 'serif' 
+            }}
+          >
+            {line}
+          </div>
+        ))}
       </div>
 
-      {/* 刷新提示 - 仅在悬停时微弱显示 */}
-      <div className="absolute bottom-2 right-2 opacity-0 group-hover/poem:opacity-20 transition-opacity">
-        <svg className={`w-3 h-3 ${loading ? 'animate-spin' : ''}`} fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
-        </svg>
+      {/* 作者信息：在最后一句出现后淡入 */}
+      <div 
+        className={`flex items-center gap-3 transition-all duration-1000 delay-1000 ${
+          displayLines.length > 0 ? 'opacity-40' : 'opacity-0'
+        }`}
+      >
+        <div className="w-8 h-[1px] bg-white"></div>
+        <span className="text-xs font-light tracking-[0.3em]">
+          {poemData.author} · 《{poemData.origin}》
+        </span>
       </div>
     </div>
   );
