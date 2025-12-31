@@ -9,14 +9,11 @@ export const PoemWidget: React.FC = () => {
     if (loading) return;
     setLoading(true);
     try {
-      // 使用今日诗词 API
       const response = await fetch('https://v1.jinrishici.com/all.json');
       const data = await response.json();
       
-      // 1. 解析数据
-      const fullContent = data.content;
-      // 按照标点拆分，但保留完整性
-      const lines = fullContent.split(/[，。？！；]/).filter((l: string) => l.trim().length > 0);
+      // 这里的正则表达式会自动识别逗号、句号、感叹号、问号，将长诗切分成短句
+      const lines = data.content.split(/[，。？！；]/).filter((l: string) => l.trim().length > 0);
       
       setPoemData({
         title: data.origin,
@@ -25,20 +22,17 @@ export const PoemWidget: React.FC = () => {
         content: data.content
       });
 
-      // 2. 逐句动画逻辑
       setDisplayLines([]);
       
-      // 第一步：先显示标题和作者
+      // 1. 先出标题作者
       const header = `${data.origin} · ${data.author}`;
-      setTimeout(() => {
-        setDisplayLines([header]);
-      }, 200);
+      setTimeout(() => setDisplayLines([header]), 200);
 
-      // 第二步：随后逐句显示正文
+      // 2. 逐句输出，确保所有句子都能进入数组
       lines.forEach((line: string, index: number) => {
         setTimeout(() => {
           setDisplayLines(prev => [...prev, line]);
-        }, (index + 1) * 1000); // 每秒出一句，节奏更有仙侠气
+        }, (index + 1) * 800); 
       });
 
     } catch (error) {
@@ -53,39 +47,33 @@ export const PoemWidget: React.FC = () => {
   }, []);
 
   return (
+    /* h-auto 确保容器高度随内容自适应，不会被切断 */
     <div 
-      className="flex flex-col items-end gap-6 cursor-pointer select-none group min-h-[300px]"
+      className="flex flex-col items-end gap-5 cursor-pointer select-none group w-full h-auto min-h-[500px]"
       onClick={fetchPoem}
     >
       {displayLines.map((line, index) => {
-        // 第一行是标题作者，样式稍有不同
         const isHeader = index === 0;
-        
         return (
           <div 
             key={index}
             className={`
-              transition-all duration-1000 ease-out animate-in fade-in slide-in-from-right-8
+              transition-all duration-1000 ease-out animate-in fade-in slide-in-from-right-10
               ${isHeader 
-                ? "text-sm font-bold opacity-40 tracking-[0.4em] mb-4 border-b border-white/10 pb-2" 
-                : "text-2xl md:text-3xl font-serif text-white/90 tracking-[0.2em] leading-relaxed"
+                ? "text-sm font-bold opacity-30 tracking-[0.5em] mb-6 border-r-2 border-white/20 pr-4 py-1" 
+                : "text-2xl md:text-4xl font-serif text-white/90 tracking-[0.25em] leading-snug text-right"
               }
             `}
             style={{ 
-              textShadow: '0 2px 15px rgba(0,0,0,0.5)',
-              fontFamily: '"Noto Serif SC", "Source Han Serif SC", "SimSun", serif'
+              textShadow: '0 4px 20px rgba(0,0,0,0.6)',
+              // 关键：强制不换行，让每句诗占一行
+              whiteSpace: 'nowrap' 
             }}
           >
             {line}
-            {!isHeader && <span className="ml-2 opacity-20">。</span>}
           </div>
         );
       })}
-
-      {/* 刷新提示 - 仅在悬停时显示 */}
-      <div className="mt-4 opacity-0 group-hover:opacity-20 transition-opacity text-[10px] text-white tracking-widest">
-        点击意境处 换一卷诗书
-      </div>
     </div>
   );
 };
