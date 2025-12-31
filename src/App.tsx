@@ -558,17 +558,32 @@ const App: React.FC = () => {
   {visibleSubCategory ? (
     <div key={visibleSubCategory.id}>
       {/* 分类标题分割线 */}
-      <div className="flex items-center gap-4 mb-6">
-        <div className={`h-[1px] flex-1 bg-gradient-to-r from-transparent ${isDark ? "to-white/20" : "to-slate-400/30"}`}></div>
-        <h3 className={`text-sm font-bold uppercase tracking-wider px-4 py-1 rounded-full border ${
-  isDark 
-    ? "text-white/80 border-white/10 bg-white/5" 
-    : "text-slate-700 border-black/5 bg-black/5"
-}`}>
-  {visibleSubCategory.title === "Default" ? visibleCategory?.title : visibleSubCategory.title}
-</h3>
-        <div className={`h-[1px] flex-1 bg-gradient-to-l from-transparent ${isDark ? "to-white/20" : "to-slate-400/30"}`}></div>
-      </div>
+      {/* 分类标题分割线区域 */}
+<div className="flex items-center gap-6 mb-8 mt-4">
+  {/* 左侧装饰线：加粗一点点 */}
+  <div className={`h-[2px] flex-1 bg-gradient-to-r from-transparent ${isDark ? "to-white/30" : "to-slate-400/40"}`}></div>
+  
+  {/* --- 强化后的标题样式 --- */}
+  <h3 className={`
+    text-lg md:text-xl font-black tracking-tight px-6 py-2 rounded-xl
+    transition-all duration-300
+    ${isDark 
+      ? "text-white bg-white/10 shadow-[0_0_20px_rgba(255,255,255,0.05)] border border-white/10" 
+      : "text-slate-900 bg-white/60 shadow-sm border border-black/5"
+    }
+  `} 
+  style={{ 
+    backdropFilter: 'blur(8px)',
+    WebkitBackdropFilter: 'blur(8px)',
+    // 强制使用系统黑体，增加可读性
+    fontFamily: 'system-ui, -apple-system, sans-serif'
+  }}>
+    {visibleSubCategory.title === "Default" ? visibleCategory?.title : visibleSubCategory.title}
+  </h3>
+  
+  {/* 右侧装饰线 */}
+  <div className={`h-[2px] flex-1 bg-gradient-to-l from-transparent ${isDark ? "to-white/30" : "to-slate-400/40"}`}></div>
+</div>
 
       {/* 修改后的网格布局：手机1列，平板2列，电脑4列 */}
       <div 
