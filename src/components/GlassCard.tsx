@@ -45,7 +45,7 @@ export const GlassCard: React.FC<GlassCardProps> = ({
         ? `
       hover:scale-[1.02] 
       hover:-translate-y-1 
-      hover:shadow-[0_20px_40px_-5px_rgba(0,0,0,0.3)]
+      hover:shadow-[0_20px_40px_-10px_rgba(0,0,0,0.3),0_0_30px_rgba(var(--theme-primary-rgb),0.6)]
       ${isDark ? "hover:border-white/20" : "hover:border-white/50"} 
       cursor-pointer`
         : ""
