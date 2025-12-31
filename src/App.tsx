@@ -12,7 +12,7 @@ import {
 } from "lucide-react";
 import * as Icons from "lucide-react";
 import { SmartIcon } from "./components/SmartIcon";
-
+import { ConsoleLog } from "./components/ConsoleLog";
 import { SearchBar } from "./components/SearchBar";
 import { GlassCard } from "./components/GlassCard";
 import { LinkManagerModal } from "./components/LinkManagerModal";
@@ -51,7 +51,29 @@ const App: React.FC = () => {
   const navTrackRef = useRef<HTMLDivElement>(null);
 
   const isFirstRender = useRef(true);
+  const hexToRgb = (hex: string) => {
+  // 兼容处理：确保 hex 是标准的 #RRGGBB 格式
+  let s = hex.startsWith('#') ? hex : '#' + hex;
+  if (s.length === 4) { // 处理简写如 #f00
+    s = '#' + s[1] + s[1] + s[2] + s[2] + s[3] + s[3];
+  }
+  const r = parseInt(s.slice(1, 3), 16);
+  const g = parseInt(s.slice(3, 5), 16);
+  const b = parseInt(s.slice(5, 7), 16);
+  return `${r}, ${g}, ${b}`;
+};
+  useEffect(() => {
+  // 设置原始颜色变量
+  document.documentElement.style.setProperty("--theme-primary", themeColor);
 
+  // --- 新增：设置 RGB 分量变量，供 GlassCard 的 rgba() 使用 ---
+  document.documentElement.style.setProperty("--theme-primary-rgb", hexToRgb(themeColor));
+
+  document.documentElement.style.setProperty(
+    "--theme-hover",
+    `color-mix(in srgb, ${themeColor}, black 10%)`
+  );
+}, [themeColor]);
   // Initial Data Fetch
   useEffect(() => {
     const initData = async () => {
@@ -521,134 +543,92 @@ const App: React.FC = () => {
         <section className="w-full mb-14 animate-fade-in-down relative z-[70] isolation-isolate">
           <SearchBar themeMode={themeMode} />
         </section>
-
+{/* 在 App.tsx 的 SearchBar 容器上方 */}
+<div className="w-full flex flex-col items-center mb-10">
+  {/* 名言组件 - 居中显示 */}
+  <ConsoleLog />
+  
+  {/* 装饰短线 */}
+  <div 
+    className="w-16 h-[2px] mt-4 opacity-30 rounded-full"
+    style={{ backgroundColor: 'var(--theme-primary)' }}
+  ></div>
+</div>
         <main className="w-full pb-20 relative z-[10] space-y-8">
-          {visibleSubCategory ? (
-            <div key={visibleSubCategory.id} className="">
-              <div className="flex items-center gap-4 mb-6">
-                <div
-                  className={`h-[1px] flex-1 bg-gradient-to-r from-transparent ${
-                    isDark ? "to-white/20" : "to-slate-400/30"
-                  }`}
-                ></div>
-                <h3
-                  className={`text-[10px] font-bold uppercase tracking-[0.2em] px-2 ${
-                    isDark ? "text-white/50" : "text-slate-400"
-                  }`}
-                >
-                  {visibleSubCategory.title === "Default"
-                    ? visibleCategory?.title
-                    : visibleSubCategory.title}
-                </h3>
-                <div
-                  className={`h-[1px] flex-1 bg-gradient-to-l from-transparent ${
-                    isDark ? "to-white/20" : "to-slate-400/30"
-                  }`}
-                ></div>
-              </div>
+  {visibleSubCategory ? (
+    <div key={visibleSubCategory.id}>
+      {/* 分类标题分割线 */}
+      <div className="flex items-center gap-4 mb-6">
+        <div className={`h-[1px] flex-1 bg-gradient-to-r from-transparent ${isDark ? "to-white/20" : "to-slate-400/30"}`}></div>
+        <h3 className={`text-[10px] font-bold uppercase tracking-[0.2em] px-2 ${isDark ? "text-white/50" : "text-slate-400"}`}>
+          {visibleSubCategory.title === "Default" ? visibleCategory?.title : visibleSubCategory.title}
+        </h3>
+        <div className={`h-[1px] flex-1 bg-gradient-to-l from-transparent ${isDark ? "to-white/20" : "to-slate-400/30"}`}></div>
+      </div>
 
-              <div 
-                key={visibleSubCategory.id} // Force re-render on sub-category change to replay animations
-                className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-3 sm:gap-4"
-              >
-                {visibleSubCategory.items.map((link, index) => (
-                  <GlassCard
-  key={link.id}
-  hoverEffect={true}
-  opacity={cardOpacity}
-  themeMode={themeMode}
-  onClick={() => window.open(link.url, "_blank")}
-  className="
-    h-14
-    px-3
-    flex
-    items-center
-    gap-3
-    cursor-pointer
-    relative
-    group
-    animate-card-enter
-  "
-  style={{ animationFillMode: "backwards" }}
-  title={
-    link.description
-      ? `${link.description}\n${link.url}`
-      : `${link.title}\n${link.url}`
-  }
->
-  {/* 左侧图标 */}
-  <div
-    className={`
-      flex
-      items-center
-      justify-center
-      h-9
-      w-9
-      rounded-lg
-      transition-transform
-      duration-300
-      group-hover:scale-110
-      ${isDark ? "text-white/90" : "text-slate-700"}
-    `}
-  >
-    <SmartIcon
-      icon={link.icon}
-      size={28}
-      imgClassName="w-7 h-7 object-contain drop-shadow-md rounded-md"
-    />
-  </div>
-
-  {/* 右侧文字 */}
-  <div className="flex flex-col justify-center min-w-0">
-    <span
-      className={`
-        text-[14px]
-        font-semibold
-        truncate
-        ${isDark ? "text-white" : "text-slate-800"}
-      `}
-    >
-      {link.title}
-    </span>
-
-    {link.description && (
-      <span
-        className={`
-          text-[11px]
-          truncate
-          ${isDark ? "text-white/50" : "text-slate-500"}
-        `}
+      {/* 修改后的网格布局：手机1列，平板2列，电脑4列 */}
+      <div 
+        key={visibleSubCategory.id}
+        className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4"
       >
-        {link.description}
-      </span>
-    )}
-  </div>
-</GlassCard>
-
-                ))}
-              </div>
-
-              {visibleSubCategory.items.length === 0 && (
-                <div
-                  className={`text-center py-16 flex flex-col items-center gap-3 ${
-                    isDark ? "text-white/20" : "text-slate-400"
-                  }`}
-                >
-                  <FolderOpen size={40} strokeWidth={1} />
-                  <p className="text-sm">{t("no_links")}</p>
-                </div>
-              )}
-            </div>
-          ) : (
+        {visibleSubCategory.items.map((link) => (
+          <GlassCard
+            key={link.id}
+            hoverEffect={true}
+            opacity={cardOpacity}
+            themeMode={themeMode}
+            onClick={() => window.open(link.url, "_blank")}
+            // 修改为 h-20 且 padding 增加，内容水平排列
+            className="h-20 flex flex-row items-center px-5 gap-5 group animate-card-enter"
+            style={{ animationFillMode: 'backwards' }}
+            title={`${link.title}\n${link.url}`}
+          >
+            {/* 图标容器：尺寸加大 50% (24px -> 36px) */}
             <div
-              className={`text-center py-12 ${
-                isDark ? "text-white/30" : "text-slate-400"
+              className={`flex-shrink-0 transition-transform duration-300 group-hover:scale-110 flex items-center justify-center h-9 w-9 ${
+                isDark ? "text-white/90" : "text-slate-700"
               }`}
             >
-              No sub-categories found. Click Settings to configure.
+              <SmartIcon 
+                icon={link.icon} 
+                size={36} 
+                imgClassName="w-9 h-9 object-contain drop-shadow-md rounded-lg"
+              />
             </div>
-          )}
-        </main>
+
+            {/* 文字容器：靠左对齐，字号加大 */}
+            <div className="flex flex-col items-start overflow-hidden">
+              <span
+                className={`text-[16px] font-bold truncate w-full transition-colors duration-300 ${
+                  isDark ? "text-white group-hover:text-[var(--theme-primary)]" : "text-slate-800"
+                }`}
+              >
+                {link.title}
+              </span>
+              {/* 可选：显示描述信息 */}
+              {link.description && (
+                <span className={`text-[11px] truncate w-full opacity-50 ${isDark ? "text-white/60" : "text-slate-500"}`}>
+                  {link.description}
+                </span>
+              )}
+            </div>
+          </GlassCard>
+        ))}
+      </div>
+
+      {visibleSubCategory.items.length === 0 && (
+        <div className={`text-center py-16 flex flex-col items-center gap-3 ${isDark ? "text-white/20" : "text-slate-400"}`}>
+          <FolderOpen size={40} strokeWidth={1} />
+          <p className="text-sm">{t("no_links")}</p>
+        </div>
+      )}
+    </div>
+  ) : (
+    <div className={`text-center py-12 ${isDark ? "text-white/30" : "text-slate-400"}`}>
+      No sub-categories found.
+    </div>
+  )}
+</main>
       </div>
 
       <SyncIndicator />
