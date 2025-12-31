@@ -654,6 +654,25 @@ const App: React.FC = () => {
     </div>
   )}
 </main>
+    {/* --- 新增：左右对称挂件 --- */}
+    
+    {/* 左侧时钟：只要屏幕大于 1024px (lg) 就显示 */}
+    <div className="hidden lg:flex fixed left-6 top-1/2 -translate-y-1/2 z-[100]">
+      <div className="group transition-all duration-500 hover:translate-x-3">
+        <GlassCard className="p-5 w-44 border border-white/10 shadow-2xl bg-white/5 backdrop-blur-xl">
+          <ClockWidget />
+        </GlassCard>
+      </div>
+    </div>
+
+    {/* 右侧诗词：只要屏幕大于 1024px (lg) 就显示 */}
+    <div className="hidden lg:flex fixed right-6 top-1/2 -translate-y-1/2 z-[100]">
+      <div className="group transition-all duration-500 hover:-translate-x-3">
+        <GlassCard className="p-5 w-60 border border-white/10 shadow-2xl bg-white/5 backdrop-blur-xl">
+          <PoemWidget />
+        </GlassCard>
+      </div>
+    </div>
       </div>
 
       <SyncIndicator />
