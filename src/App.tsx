@@ -665,15 +665,13 @@ const App: React.FC = () => {
       </div>
     </div>
 
-    {/* 右侧诗词：只要屏幕大于 1024px (lg) 就显示 */}
-    <div className="hidden lg:flex fixed right-6 top-1/2 -translate-y-1/2 z-[100]">
-      <div className="group transition-all duration-500 hover:-translate-x-3">
-        <GlassCard className="p-5 w-60 border border-white/10 shadow-2xl bg-white/5 backdrop-blur-xl">
-          <PoemWidget />
-        </GlassCard>
-      </div>
-    </div>
-      </div>
+{/* 在 App.tsx 中找到放置 PoemWidget 的位置 */}
+<div className="fixed left-16 top-1/2 -translate-y-1/2 z-40 max-w-2xl">
+  {/* 彻底去掉边框和背景，只保留一个简单的容器 */}
+  <div className="transition-transform duration-700 hover:translate-x-4">
+    <PoemWidget />
+  </div>
+</div>
 
       <SyncIndicator />
 
