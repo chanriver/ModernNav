@@ -544,15 +544,15 @@ const App: React.FC = () => {
           <SearchBar themeMode={themeMode} />
         </section>
 {/* 在 App.tsx 的 SearchBar 容器下方 */}
-<div className="w-full flex flex-col items-center mb-10">
+<div className="w-full flex flex-col items-center mt-[-24px] mb-6">
   {/* 名言组件 - 居中显示 */}
   <ConsoleLog />
   
   {/* 装饰短线 */}
-  <div 
+{/*  <div 
     className="w-16 h-[2px] mt-4 opacity-30 rounded-full"
     style={{ backgroundColor: 'var(--theme-primary)' }}
-  ></div>
+  ></div> */}
 </div>
         <main className="w-full pb-20 relative z-[10] space-y-8">
   {visibleSubCategory ? (
