@@ -574,7 +574,7 @@ const App: React.FC = () => {
         {visibleSubCategory.items.map((link) => (
           <GlassCard
             key={link.id}
-            title={`${link.title}\n介绍：${link.description || '暂无简介'}\n链接：${link.url}`}
+            title={link.description ? `站点：${link.title}\n简介：${link.description}` : link.title}
             hoverEffect={true}
             opacity={cardOpacity}
             themeMode={themeMode}
@@ -607,11 +607,11 @@ const App: React.FC = () => {
                 {link.title}
               </span>
               {/* 可选：显示描述信息 */}
-              {link.description && (
+             {/* {link.description && (
                 <span className={`text-[11px] truncate w-full opacity-50 ${isDark ? "text-white/60" : "text-slate-500"}`}>
                   {link.description}
                 </span>
-              )}
+              )} */}
             </div>
           </GlassCard>
         ))}
