@@ -544,7 +544,7 @@ const App: React.FC = () => {
           <SearchBar themeMode={themeMode} />
         </section>
 {/* 在 App.tsx 的 SearchBar 容器下方 */}
-<div className="w-full flex flex-col items-center mt-[-24px] mb-6">
+<div className="w-full flex flex-col items-center mt-[-50px] mb-6">
   {/* 名言组件 - 居中显示 */}
   <ConsoleLog />
   
