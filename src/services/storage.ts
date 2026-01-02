@@ -1,15 +1,6 @@
 import { Category, ThemeMode, UserPreferences } from "../types";
 import { INITIAL_CATEGORIES } from "../constants";
-
-// --- AUTH STATE ---
-let _accessToken: string | null = null;
-let _isRefreshing = false;
-let _refreshSubscribers: ((token: string) => void)[] = [];
-const AUTH_KEYS = {
-  ACCESS_TOKEN: "modernNav_token",
-  TOKEN_EXPIRY: "modernNav_tokenExpiry",
-  USER_LOGGED_OUT: "modernNav_userLoggedOut",
-};
+import { apiClient } from "./apiClient";
 
 // --- EVENT LISTENERS ---
 type NotifyType = "success" | "error" | "info";
@@ -77,96 +68,13 @@ const safeLocalStorageSet = (key: string, value: any) => {
   }
 };
 
-// --- AUTH LOGIC ---
-
-const onRefreshed = (token: string) => {
-  _refreshSubscribers.forEach((cb) => cb(token));
-  _refreshSubscribers = [];
-};
-
-const tryRefreshToken = async (): Promise<string | null> => {
-  try {
-    const res = await fetch("/api/auth", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ action: "refresh" }),
-    });
-
-    if (res.ok) {
-      const data = await res.json();
-      _accessToken = data.accessToken;
-      if (typeof window !== "undefined") {
-        const expiryTime = new Date().getTime() + 24 * 60 * 60 * 1000;
-        localStorage.setItem(AUTH_KEYS.ACCESS_TOKEN, data.accessToken);
-        localStorage.setItem(AUTH_KEYS.TOKEN_EXPIRY, expiryTime.toString());
-      }
-      return data.accessToken;
-    } else if (res.status === 401 || res.status === 403) {
-      _accessToken = null;
-      localStorage.removeItem(AUTH_KEYS.ACCESS_TOKEN);
-      localStorage.removeItem(AUTH_KEYS.TOKEN_EXPIRY);
-      localStorage.removeItem(AUTH_KEYS.USER_LOGGED_OUT);
-    }
-    return null;
-  } catch (e) {
-    return null;
-  }
-};
-
-const ensureAccessToken = async (): Promise<string | null> => {
-  if (_accessToken) return _accessToken;
-  if (typeof window !== "undefined") {
-    const storedToken = localStorage.getItem(AUTH_KEYS.ACCESS_TOKEN);
-    const storedExpiry = localStorage.getItem(AUTH_KEYS.TOKEN_EXPIRY);
-    if (
-      storedToken &&
-      storedExpiry &&
-      parseInt(storedExpiry, 10) > new Date().getTime()
-    ) {
-      _accessToken = storedToken;
-      return _accessToken;
-    }
-  }
-
-  if (typeof window !== "undefined") {
-    const storedToken = localStorage.getItem(AUTH_KEYS.ACCESS_TOKEN);
-    const storedExpiry = localStorage.getItem(AUTH_KEYS.TOKEN_EXPIRY);
-
-    if (storedToken && storedExpiry) {
-      if (_isRefreshing)
-        return new Promise((resolve) => _refreshSubscribers.push(resolve));
-      _isRefreshing = true;
-      const newToken = await tryRefreshToken();
-      _isRefreshing = false;
-      onRefreshed(newToken || "");
-      return newToken;
-    }
-  }
-
-  return null;
-};
-
 // --- STORAGE SERVICE ---
 
 export const storageService = {
   init: () => {
     if (typeof window !== "undefined") {
-      const userLoggedOut = localStorage.getItem(AUTH_KEYS.USER_LOGGED_OUT);
-      if (userLoggedOut === "true") {
-        return;
-      }
-
       storageService._loadDirtyState();
       
-      const storedToken = localStorage.getItem(AUTH_KEYS.ACCESS_TOKEN);
-      const storedExpiry = localStorage.getItem(AUTH_KEYS.TOKEN_EXPIRY);
-
-      if (storedToken && storedExpiry) {
-        if (parseInt(storedExpiry, 10) <= new Date().getTime()) {
-          tryRefreshToken();
-        }
-      }
-
       storageService._setupOnlineListener();
 
       if (storageService.checkGlobalDirtyState()) {
@@ -265,66 +173,27 @@ export const storageService = {
   },
 
   login: async (code: string): Promise<boolean> => {
-    try {
-      const res = await fetch("/api/auth", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ action: "login", code }),
-      });
-      if (res.ok) {
-        const data = await res.json();
-        _accessToken = data.accessToken;
-        const expiryTime = new Date().getTime() + 24 * 60 * 60 * 1000;
-        localStorage.setItem(AUTH_KEYS.ACCESS_TOKEN, data.accessToken);
-        localStorage.setItem(AUTH_KEYS.TOKEN_EXPIRY, expiryTime.toString());
-        localStorage.removeItem(AUTH_KEYS.USER_LOGGED_OUT);
-        return true;
-      }
-      return false;
-    } catch {
-      return false;
-    }
+    return apiClient.login(code);
   },
 
   logout: async () => {
-    try {
-      await fetch("/api/auth", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ action: "logout" }),
-      });
-    } finally {
-      _accessToken = null;
-      if (typeof window !== "undefined") {
-        localStorage.removeItem(AUTH_KEYS.ACCESS_TOKEN);
-        localStorage.removeItem(AUTH_KEYS.TOKEN_EXPIRY);
-        localStorage.setItem(AUTH_KEYS.USER_LOGGED_OUT, "true");
-      }
-    }
+    await apiClient.logout();
   },
 
-  // 💡 保持异步接口
   isAuthenticated: async (): Promise<boolean> => {
-    const token = await ensureAccessToken();
-    return !!token;
+    return apiClient.isAuthenticated();
   },
 
   updateAccessCode: async (
     currentCode: string,
     newCode: string
   ): Promise<boolean> => {
-    const token = await ensureAccessToken();
-    if (!token) return false;
     try {
-      const res = await fetch("/api/auth", {
+      await apiClient.request("/api/auth", {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
         body: JSON.stringify({ action: "update", currentCode, newCode }),
       });
-      return res.ok;
+      return true;
     } catch {
       return false;
     }
@@ -335,8 +204,7 @@ export const storageService = {
   fetchAllData: async () => {
     let cloudData = null;
     try {
-      const res = await fetch("/api/bootstrap");
-      if (res.ok) cloudData = await res.json();
+      cloudData = await apiClient.request("/api/bootstrap");
     } catch (e) {
       console.warn("Fetch failed");
     }
@@ -360,9 +228,6 @@ export const storageService = {
     // 1. Categories
     if (!storageService._dirty.categories && cloudData?.categories) {
        finalCategories = cloudData.categories;
-    } else {
-       // Keep local version (it's either dirty or cloud is missing/failed)
-       // logic already handled by initial assignment from localStorage above
     }
 
     // 2. Background
@@ -435,8 +300,7 @@ export const storageService = {
     if (type === "prefs") storageService._dirty.prefs = true;
     storageService._saveDirtyState();
     
-    const token = await ensureAccessToken();
-    if (!token) {
+    if (!(await apiClient.isAuthenticated())) {
       storageService._isSynced = false;
       storageService._pendingSync = true;
       return;
@@ -456,38 +320,23 @@ export const storageService = {
 
     storageService.notifySyncStatus(true);
     try {
-      const res = await fetch("/api/update", {
+      await apiClient.request("/api/update", {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
         body: JSON.stringify({ type, data }),
       });
 
-      if (res.ok) {
-        storageService._isSynced = true;
-        storageService._pendingSync = false;
-        
-        // Clear dirty flag for this specific type
-        if (type === "categories") storageService._dirty.categories = false;
-        if (type === "background") storageService._dirty.background = false;
-        if (type === "prefs") storageService._dirty.prefs = false;
-        storageService._saveDirtyState();
+      storageService._isSynced = true;
+      storageService._pendingSync = false;
+      
+      // Clear dirty flag for this specific type
+      if (type === "categories") storageService._dirty.categories = false;
+      if (type === "background") storageService._dirty.background = false;
+      if (type === "prefs") storageService._dirty.prefs = false;
+      storageService._saveDirtyState();
 
-        // Check if any other items are still dirty
-        storageService._pendingSync = Object.values(storageService._dirty).some(v => v);
+      // Check if any other items are still dirty
+      storageService._pendingSync = Object.values(storageService._dirty).some(v => v);
 
-      } else if (res.status === 401) {
-        _accessToken = null;
-        localStorage.removeItem(AUTH_KEYS.ACCESS_TOKEN);
-        localStorage.removeItem(AUTH_KEYS.TOKEN_EXPIRY);
-        storageService._isSynced = false;
-        storageService._pendingSync = true;
-      } else {
-        const errorData = await res.json().catch(() => ({}));
-        throw new Error(errorData.error || "Update failed");
-      }
     } catch (e) {
       storageService._isSynced = false;
       storageService._pendingSync = true;
@@ -516,8 +365,7 @@ export const storageService = {
       return;
     }
 
-    const token = await ensureAccessToken();
-    if (!token) {
+    if (!(await apiClient.isAuthenticated())) {
       storageService.notify("error", "Authentication required to sync data");
       return;
     }
@@ -545,15 +393,11 @@ export const storageService = {
 
       // 2. Pull Cloud -> Local (Only if Clean)
       // fetch cloud data to check if we need to update anything that is NOT dirty
-      const res = await fetch("/api/bootstrap");
-      if (!res.ok) throw new Error("Failed to fetch cloud data");
-      const cloudData = await res.json();
+      const cloudData = await apiClient.request("/api/bootstrap");
 
       let updated = false;
 
       if (!storageService._dirty.categories && cloudData.categories) {
-         // Check if different to avoid unnecessary writes/renders? 
-         // For now, trust cloud is 'truth' if local is clean.
          safeLocalStorageSet(LS_KEYS.CATEGORIES, cloudData.categories);
          updated = true;
       }
@@ -568,11 +412,6 @@ export const storageService = {
          updated = true;
       }
 
-      if (updated) {
-        // We can notify the user gently, or just silently succeed.
-        // Removed the "Data synced from cloud" toast as requested to reduce noise.
-      }
-      
       // Re-evaluate pending sync status
       storageService._pendingSync = Object.values(storageService._dirty).some(v => v);
       storageService._isSynced = !storageService._pendingSync;

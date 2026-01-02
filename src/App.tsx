@@ -10,9 +10,7 @@ import {
   Loader2,
   Github,
 } from "lucide-react";
-import * as Icons from "lucide-react";
 import { SmartIcon } from "./components/SmartIcon";
-
 import { SearchBar } from "./components/SearchBar";
 import { GlassCard } from "./components/GlassCard";
 import { LinkManagerModal } from "./components/LinkManagerModal";
@@ -238,8 +236,6 @@ const App: React.FC = () => {
     setActiveCategory(catId);
     setActiveSubCategoryId(subId);
   };
-
-
 
   const toggleLanguage = () => {
     setLanguage(language === "en" ? "zh" : "en");
@@ -547,7 +543,7 @@ const App: React.FC = () => {
                 ></div>
               </div>
 
-              <div 
+              <div
                 key={visibleSubCategory.id} // Force re-render on sub-category change to replay animations
                 className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-3 sm:gap-4"
               >
@@ -560,7 +556,7 @@ const App: React.FC = () => {
                     onClick={() => window.open(link.url, "_blank")}
                     className="h-24 flex flex-col items-center justify-center text-center p-2 relative group animate-card-enter"
                     style={{
-                      animationFillMode: 'backwards'
+                      animationFillMode: "backwards",
                     }}
                     title={
                       link.description
@@ -573,9 +569,9 @@ const App: React.FC = () => {
                         isDark ? "text-white/90" : "text-slate-700"
                       }`}
                     >
-                      <SmartIcon 
-                        icon={link.icon} 
-                        size={24} 
+                      <SmartIcon
+                        icon={link.icon}
+                        size={24}
                         imgClassName="w-6 h-6 object-contain drop-shadow-md rounded-md"
                       />
                     </div>
@@ -626,7 +622,7 @@ const App: React.FC = () => {
       >
         <div className="flex gap-4">
           <a
-            href="https://math.nyc.mn"
+            href="https://coyoo.ggff.net/"
             target="_blank"
             rel="noopener noreferrer"
             className="flex items-center gap-1.5 hover:text-[var(--theme-primary)] cursor-pointer transition-colors"

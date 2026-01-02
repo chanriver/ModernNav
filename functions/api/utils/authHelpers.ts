@@ -5,7 +5,7 @@ const REFRESH_TTL = 7 * 24 * 60 * 60 * 1000; // 7天
 
 // 请求限制配置
 const RATE_LIMIT_WINDOW = 15 * 60 * 1000; // 15分钟窗口
-const RATE_LIMIT_MAX_REQUESTS = 10; // 最大请求数
+const RATE_LIMIT_MAX_REQUESTS = 100; // 最大请求数
 
 // 错误消息
 const ERROR_MESSAGES = {
@@ -64,22 +64,53 @@ export function respondWithCookie(body: any, token: string, clear = false) {
     (clear ? "" : token) +
     "; HttpOnly; Secure; SameSite=Strict; Path=/api/auth; Max-Age=" +
     (clear ? 0 : REFRESH_TTL / 1000);
+  
   return new Response(JSON.stringify(body), {
-    headers: { "Content-Type": "application/json", "Set-Cookie": cookie },
+    headers: { 
+      "Content-Type": "application/json", 
+      "Set-Cookie": cookie,
+      // 增加安全头
+      "X-Content-Type-Options": "nosniff",
+      "X-Frame-Options": "DENY"
+    },
   });
 }
 
 // 速率限制助手
 export class RateLimiter {
   private store: Map<string, { count: number; resetTime: number }> = new Map();
+  private lastCleanup: number = Date.now();
+  private requestCount: number = 0;
 
   constructor(
     private maxRequests: number = RATE_LIMIT_MAX_REQUESTS,
     private windowMs: number = RATE_LIMIT_WINDOW
   ) {}
 
+  /**
+   * 清理过期记录，防止内存泄漏
+   */
+  private cleanup() {
+    const now = Date.now();
+    for (const [key, record] of this.store.entries()) {
+      if (now > record.resetTime) {
+        this.store.delete(key);
+      }
+    }
+    this.lastCleanup = now;
+  }
+
   isAllowed(identifier: string): boolean {
     const now = Date.now();
+    this.requestCount++;
+
+    if (
+      (this.requestCount % 1000 === 0 || now - this.lastCleanup > 60 * 60 * 1000) &&
+      this.store.size > 100
+    ) {
+      this.cleanup();
+    }
+
     const record = this.store.get(identifier);
 
     if (!record || now > record.resetTime) {

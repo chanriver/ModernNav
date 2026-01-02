@@ -162,6 +162,7 @@ export const onRequestPost = async ({
         // 验证刷新令牌是否有效
         const isValid = await verify(rfToken, storedCode);
         if (!isValid) {
+          console.log("Refresh token invalid or expired");
           return respondWithCookie(
             { error: ERROR_MESSAGES.INVALID_TOKEN },
             "",
@@ -169,7 +170,7 @@ export const onRequestPost = async ({
           );
         }
       } catch (error) {
-        console.error("Token verification error:", error);
+        console.error("Token verification error during refresh:", error);
         return respondWithCookie(
           { error: ERROR_MESSAGES.INVALID_TOKEN },
           "",
