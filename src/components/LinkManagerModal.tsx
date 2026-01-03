@@ -24,8 +24,14 @@ interface LinkManagerModalProps {
   setCategories: React.Dispatch<React.SetStateAction<Category[]>>;
   background: string;
   prefs: UserPreferences;
-  onUpdateAppearance: (url: string, opacity: number, color?: string) => void;
-  onUpdateTheme?: (color: string, auto: boolean) => void;
+  onUpdateAppearance: (
+    url: string,
+    opacity: number,
+    color?: string,
+    layoutPrefs?: { width: number; cardWidth: number; cardHeight: number; cols: number },
+    themeAuto?: boolean
+  ) => void;
+
   isDefaultCode?: boolean;
 }
 
@@ -37,7 +43,6 @@ export const LinkManagerModal: React.FC<LinkManagerModalProps> = ({
   background,
   prefs,
   onUpdateAppearance,
-  onUpdateTheme,
   isDefaultCode = false,
 }) => {
   const { t } = useLanguage();
@@ -96,11 +101,13 @@ export const LinkManagerModal: React.FC<LinkManagerModalProps> = ({
     if (newBg || newPrefs) {
       const bg = newBg || background;
       const opacity = newPrefs?.cardOpacity ?? prefs.cardOpacity;
-      onUpdateAppearance(bg, opacity);
-
-      if (onUpdateTheme && newPrefs?.themeColor) {
-        onUpdateTheme(newPrefs.themeColor, newPrefs.themeColorAuto ?? true);
-      }
+      onUpdateAppearance(
+        bg,
+        opacity,
+        newPrefs?.themeColor,
+        undefined,
+        newPrefs?.themeColorAuto ?? true
+      );
 
       // Persist these as they might not be fully synced in the onUpdate callback depending on implementation
       if (newBg) storageService.setBackground(newBg);
@@ -211,7 +218,13 @@ export const LinkManagerModal: React.FC<LinkManagerModalProps> = ({
                   currentThemeColor={prefs.themeColor || "#6280a3"}
                   currentThemeAuto={prefs.themeColorAuto ?? true}
                   onUpdate={onUpdateAppearance}
-                  onUpdateTheme={onUpdateTheme}
+                  currentLayout={{
+                    width: prefs.maxContainerWidth ?? 900,
+                    cardWidth: prefs.cardWidth ?? 96,
+                    cardHeight: prefs.cardHeight ?? 96,
+                    cols: prefs.gridColumns ?? 6,
+                  }}
+
                 />
               )}
               {activeTab === "data" && (

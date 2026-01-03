@@ -37,4 +37,10 @@ export interface UserPreferences {
   themeColor?: string;
   themeMode: ThemeMode;
   themeColorAuto?: boolean;
+  maxContainerWidth?: number;
+  cardWidth?: number;
+  cardHeight?: number;
+  gridColumns?: number;
 }
+
+

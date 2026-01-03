@@ -8,27 +8,24 @@ ModernNav 是一个现代、极简的卡片式导航仪表盘，采用毛玻璃�
 
 ## ✨ 功能特性
 
-- **🎨 惊艳的 UI 设计:** 采用自适应毛玻璃特效（Glassmorphism），拥有流畅的动画效果和响应式布局。
-- **🌓 深色/浅色模式:** 支持自动主题切换，并能从背景图片中智能提取主色调。
+- **🎨 沉浸式 UI (v3.0):** 采用全宽背景预览与高密度“自定义设置”控制区，支持实时预览与磨砂玻璃特效。
+- **⚙️ 精密布局引擎 (v3.0):** 支持动态调节卡片宽高、画布宽度、强制网格列数以及卡片透明度，确保布局确定性。
+- **🔌 核心架构解耦 (v3.0):** 逻辑完全从视图剥离至 `useDashboardLogic` Hook，大幅提升组件响应速度与代码健壮性。
+- **🌓 智能色彩提取:** 支持自动主题切换，并能从背景图片中智能提取主色调。
 - **🖱️ 拖拽排序:** 在管理界面通过拖拽轻松调整分类和链接的顺序。
-- **🖼️ 高度个性化:** 支持更换背景图片、调节卡片模糊度和透明度，以及自定义主题颜色。
-- **📂 分组管理:** 支持创建一级分类和二级子菜单（文件夹）来整理链接。
-- **🔍 聚合搜索:** 内置搜索栏，支持 Google、必应、百度、GitHub 等多种搜索引擎切换。
-- **🔐 无状态安全认证:** 采用 **HMAC 签名无状态认证**。保留 HttpOnly Cookie 和短效访问令牌的双重安全机制，全面防止 XSS 与 CSRF 攻击。
-- **🛡️ 数据健壮性保护:** 内置严格的数据类型校验与容错机制，自动修复异常数据结构，杜绝白屏崩溃，确保系统在数据格式升级或异常时依然稳定运行。
-- **☁️ 智能混合存储 (v2.0 升级版):**
-  - **脏数据优先策略 (Dirty-First):** 引入智能状态追踪机制。当本地存在未同步的修改（Dirty Data）时，系统强制使用本地数据，防止被云端旧数据覆盖。
-  - **状态持久化:** “未同步”状态被持久化存储。即使在修改后立即刷新页面或关闭浏览器，未上传的更改也不会丢失，系统会在下次在线时自动重试。
-  - **即时一致性:** 后端移除缓存逻辑，确保每次读取配置均为数据库最新状态，杜绝“回退”现象。
-- **🌍 国际化:** 内置英语和简体中文支持。
-- **💾 全量备份:** 支持将所有数据（分类、链接、背景设置、偏好设置）导出为 JSON 文件，或随时一键恢复。
+- **🖼️ 高度个性化:** 深度自定义卡片规格、背景样式及主题细节，提供极致的创作自由度。
+- **🌍 国际化 & 人文文案:** 内置专业优化过的中英文人文感文案支持。
+- **⚡ 极简反馈系统:** 独创纯文字发光浮动提示，消除视觉噪声。
+- **🔐 增强型安全认证 (v2.1):** 统一 API 客户端，支持 HttpOnly Cookie 无感刷新与 CSRF 防御。
+- **☁️ 智能混合存储 (v2.0):** 采用“脏数据优先”策略与状态持久化机制，解决数据覆盖与丢失问题。
+- **💾 全量备份:** 支持数据一键导入/导出。
 
 ## 🛠️ 技术栈
 
 - **前端:** React 19, Vite, Tailwind CSS, Lucide React
-- **后端:** Cloudflare Pages Functions (Serverless 无服务器函数)
+- **后端:** Cloudflare Pages Functions (Serverless)
 - **数据库:** Cloudflare D1 (Serverless SQL Database)
-- **鉴权:** 无状态 JWT (HMAC-SHA256) + HttpOnly Cookie
+- **鉴权 & 请求:** Unified API Client + Silent Refresh (JWT HMAC-SHA256)
 - **语言:** TypeScript
 
 ## 🚀 快速开始
@@ -129,6 +126,7 @@ npm run dev
 ├── functions/api/              # Cloudflare Pages Functions (后端 API)
 │   ├── auth.ts                 # 鉴权接口 (登录/刷新/修改密码)
 │   ├── bootstrap.ts            # 初始化数据接口 (Read D1)
+│   ├── health.ts               # 健康检查接口
 │   ├── update.ts               # 数据同步接口 (Write D1)
 │   └── utils/                  # 后端工具函数 (鉴权/验证/日志)
 ├── src/                        # 前端源代码
@@ -140,19 +138,25 @@ npm run dev
 │   │   │   ├── ContentTab.tsx      # 内容管理页
 │   │   │   ├── DataTab.tsx         # 数据备份/恢复页
 │   │   │   └── SecurityTab.tsx     # 安全设置页
+│   │   ├── BackgroundLayer.tsx # 沉浸式背景渲染
 │   │   ├── CategoryNav.tsx     # 侧边/顶部导航栏
+│   │   ├── Footer.tsx          # 响应式页脚
 │   │   ├── GlassCard.tsx       # 毛玻璃卡片组件
 │   │   ├── IconPicker.tsx      # 图标选择组件
 │   │   ├── LinkManagerModal.tsx # 设置弹窗容器
-│   │   ├── SearchBar.tsx       # 搜索组件
+│   │   ├── SearchBar.tsx       # 聚合搜索组件
+│   │   ├── SkeletonLoader.tsx  # 语义化骨架屏
+│   │   ├── SmartIcon.tsx       # 智能图标捕获
 │   │   ├── SyncIndicator.tsx   # 同步状态指示器
 │   │   └── Toast.tsx           # 全局提示组件
 │   ├── contexts/               # 全局状态管理
 │   │   └── LanguageContext.tsx # 多语言 Context
 │   ├── hooks/                  # 自定义 Hooks
+│   │   ├── useDashboardLogic.ts # 核心业务逻辑 (状态/同步/更新)
 │   │   └── useCategoryDragDrop.ts # 拖拽排序逻辑
 │   ├── services/               # 业务服务层
-│   │   └── storage.ts          # 数据存储与同步服务 (核心)
+│   │   ├── apiClient.ts        # 统一 API 客户端 (认证/拦截/重试)
+│   │   └── storage.ts          # 数据存储与同步服务 (核心逻辑)
 │   ├── types/                  # TypeScript 类型定义
 │   │   └── index.ts            # 类型声明入口
 │   ├── utils/                  # 前端工具函数

@@ -85,6 +85,16 @@ const translations = {
     theme_updated: "Theme color updated!",
     extracting_color: "Extracting color...",
 
+    // Layout/Precision
+    precision_controls: "Custom Settings",
+    geometry_layout: "Card specifications and layout",
+    canvas_width: "Canvas Width",
+    grid_cols: "Grid Columns",
+    card_width: "Card Width",
+    card_height: "Card Height",
+    surface_opacity: "Surface Opacity",
+    visual_identity: "Visual Identity",
+
     // Manager UI
     sidebar_categories: "Categories",
     search_links_placeholder: "Search links...",
@@ -197,6 +207,16 @@ const translations = {
     btn_custom_color: "自定义选择",
     theme_updated: "主题色已更新！",
     extracting_color: "正在提取颜色...",
+
+    // Layout/Precision
+    precision_controls: "自定义设置",
+    geometry_layout: "卡片规格与布局",
+    canvas_width: "画布宽度",
+    grid_cols: "网格列数",
+    card_width: "卡片宽度",
+    card_height: "卡片高度",
+    surface_opacity: "卡片表面透明度",
+    visual_identity: "视觉识别",
 
     // Manager UI
     sidebar_categories: "分类列表",
