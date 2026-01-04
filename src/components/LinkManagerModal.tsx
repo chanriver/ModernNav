@@ -144,10 +144,10 @@ export const LinkManagerModal: React.FC<LinkManagerModalProps> = ({
                 <div className="flex bg-slate-950/50 rounded-lg p-1 border border-white/[0.05]">
                   <button
                     onClick={() => setActiveTab("content")}
-                    className={`px-4 py-1.5 rounded-md text-xs font-medium transition-all ${
+                    className={`tab-pill ${
                       activeTab === "content"
-                        ? "bg-[var(--theme-primary)] text-white shadow-md"
-                        : "text-slate-400 hover:text-white hover:bg-white/5"
+                        ? "tab-pill-active"
+                        : "tab-pill-inactive"
                     }`}
                   >
                     <LayoutGrid size={14} className="inline mr-1 mb-0.5" />{" "}
@@ -155,10 +155,10 @@ export const LinkManagerModal: React.FC<LinkManagerModalProps> = ({
                   </button>
                   <button
                     onClick={() => setActiveTab("general")}
-                    className={`px-4 py-1.5 rounded-md text-xs font-medium transition-all ${
+                    className={`tab-pill ${
                       activeTab === "general"
-                        ? "bg-[var(--theme-primary)] text-white shadow-md"
-                        : "text-slate-400 hover:text-white hover:bg-white/5"
+                        ? "tab-pill-active"
+                        : "tab-pill-inactive"
                     }`}
                   >
                     <Settings size={14} className="inline mr-1 mb-0.5" />{" "}
@@ -166,10 +166,10 @@ export const LinkManagerModal: React.FC<LinkManagerModalProps> = ({
                   </button>
                   <button
                     onClick={() => setActiveTab("appearance")}
-                    className={`px-4 py-1.5 rounded-md text-xs font-medium transition-all ${
+                    className={`tab-pill ${
                       activeTab === "appearance"
-                        ? "bg-[var(--theme-primary)] text-white shadow-md"
-                        : "text-slate-400 hover:text-white hover:bg-white/5"
+                        ? "tab-pill-active"
+                        : "tab-pill-inactive"
                     }`}
                   >
                     <ImageIcon size={14} className="inline mr-1 mb-0.5" />{" "}
@@ -177,10 +177,10 @@ export const LinkManagerModal: React.FC<LinkManagerModalProps> = ({
                   </button>
                   <button
                     onClick={() => setActiveTab("data")}
-                    className={`px-4 py-1.5 rounded-md text-xs font-medium transition-all ${
+                    className={`tab-pill ${
                       activeTab === "data"
-                        ? "bg-[var(--theme-primary)] text-white shadow-md"
-                        : "text-slate-400 hover:text-white hover:bg-white/5"
+                        ? "tab-pill-active"
+                        : "tab-pill-inactive"
                     }`}
                   >
                     <Database size={14} className="inline mr-1 mb-0.5" />{" "}
@@ -188,10 +188,10 @@ export const LinkManagerModal: React.FC<LinkManagerModalProps> = ({
                   </button>
                   <button
                     onClick={() => setActiveTab("security")}
-                    className={`px-4 py-1.5 rounded-md text-xs font-medium transition-all ${
+                    className={`tab-pill ${
                       activeTab === "security"
-                        ? "bg-[var(--theme-primary)] text-white shadow-md"
-                        : "text-slate-400 hover:text-white hover:bg-white/5"
+                        ? "tab-pill-active"
+                        : "tab-pill-inactive"
                     }`}
                   >
                     <ShieldCheck size={14} className="inline mr-1 mb-0.5" />{" "}

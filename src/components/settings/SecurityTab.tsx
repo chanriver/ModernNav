@@ -61,7 +61,7 @@ export const SecurityTab: React.FC = () => {
         </div>
         <form onSubmit={handleUpdate} className="space-y-5 max-w-sm mx-auto">
           <div>
-            <label className="block text-[10px] font-black text-slate-500 uppercase tracking-[0.2em] mb-2">
+            <label className="label-xs mb-2 tracking-[0.2em]">
               {t("current_code")}
             </label>
             <input
@@ -74,7 +74,7 @@ export const SecurityTab: React.FC = () => {
             />
           </div>
           <div>
-            <label className="block text-[10px] font-black text-slate-500 uppercase tracking-[0.2em] mb-2">
+            <label className="label-xs mb-2 tracking-[0.2em]">
               {t("new_code")}
             </label>
             <input
@@ -87,7 +87,7 @@ export const SecurityTab: React.FC = () => {
             />
           </div>
           <div>
-            <label className="block text-[10px] font-black text-slate-500 uppercase tracking-[0.2em] mb-2">
+            <label className="label-xs mb-2 tracking-[0.2em]">
               {t("confirm_code")}
             </label>
             <input

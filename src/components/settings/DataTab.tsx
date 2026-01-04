@@ -70,14 +70,14 @@ export const DataTab: React.FC<DataTabProps> = ({
             </p>
           </div>
         </div>
-        <div className="bg-slate-800/40 p-6 rounded-2xl border border-white/[0.08]">
+        <div className="panel-base p-6 rounded-2xl">
           <h3 className="text-white font-bold mb-1 tracking-tight">
             {t("backup_config")}
           </h3>
           <p className="text-xs text-slate-500 mb-6">{t("backup_desc")}</p>
           <button
             onClick={handleExport}
-            className="w-full bg-white/5 hover:bg-white/10 text-white border border-white/[0.08] px-4 py-3 rounded-xl flex items-center justify-center gap-3 transition-all text-xs font-bold uppercase tracking-widest group"
+            className="btn-secondary w-full py-3 font-bold uppercase tracking-widest group"
           >
             <Download
               size={18}
@@ -86,7 +86,7 @@ export const DataTab: React.FC<DataTabProps> = ({
             {t("download_backup")}
           </button>
         </div>
-        <div className="bg-slate-800/40 p-6 rounded-2xl border border-white/[0.08]">
+        <div className="panel-base p-6 rounded-2xl">
           <h3 className="text-white font-bold mb-1 tracking-tight">
             {t("restore_config")}
           </h3>
@@ -100,7 +100,7 @@ export const DataTab: React.FC<DataTabProps> = ({
           />
           <button
             onClick={() => fileInputRef.current?.click()}
-            className="w-full bg-white/5 hover:bg-white/10 text-white border border-white/[0.08] px-4 py-3 rounded-xl flex items-center justify-center gap-3 transition-all text-xs font-bold uppercase tracking-widest group"
+            className="btn-secondary w-full py-3 font-bold uppercase tracking-widest group"
           >
             <Upload
               size={18}

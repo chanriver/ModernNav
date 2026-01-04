@@ -150,7 +150,7 @@ export const AppearanceTab: React.FC<AppearanceTabProps> = ({
           <div className="p-6 pt-2 space-y-4">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div className="space-y-1.5">
-                <label className="text-[9px] font-black text-slate-500 uppercase tracking-widest pl-1">
+                <label className="label-xs pl-1">
                   {t("bg_url_label")}
                 </label>
                 <div className="relative group/input text-sm">
@@ -166,7 +166,7 @@ export const AppearanceTab: React.FC<AppearanceTabProps> = ({
               </div>
 
               <div className="space-y-1.5">
-                <label className="text-[9px] font-black text-slate-500 uppercase tracking-widest pl-1">
+                <label className="label-xs pl-1">
                   {t("label_theme_color")}
                 </label>
                 <div className="flex items-center gap-2">
@@ -188,7 +188,7 @@ export const AppearanceTab: React.FC<AppearanceTabProps> = ({
                   <button
                     onClick={handleAutoExtract}
                     disabled={isExtracting}
-                    className="h-9 px-4 rounded-xl bg-white/5 hover:bg-white/10 text-slate-500 border border-white/5 transition-all flex items-center justify-center gap-2 shrink-0 group disabled:opacity-50"
+                    className="btn-secondary h-9 px-4 rounded-xl disabled:opacity-50"
                     title={t("btn_auto_extract")}
                   >
                     {isExtracting ? (
@@ -345,14 +345,14 @@ export const AppearanceTab: React.FC<AppearanceTabProps> = ({
         <div className="flex items-center gap-3 pt-1">
           <button
             onClick={handleResetBackground}
-            className="flex-1 px-5 py-2.5 rounded-2xl bg-white/5 hover:bg-white/10 text-slate-500 border border-white/5 transition-all flex items-center justify-center gap-2 group"
+            className="btn-secondary flex-1 py-2.5 rounded-2xl tracking-[0.15em] font-bold uppercase group"
           >
             <RotateCcw size={16} className="group-active:rotate-[-90deg] transition-transform" />
-            <span className="text-[10px] font-bold uppercase tracking-[0.15em]">{t("reset_bg_btn")}</span>
+            <span className="text-[10px]">{t("reset_bg_btn")}</span>
           </button>
           <button
             onClick={handleUpdateSettings}
-            className="flex-1 bg-[var(--theme-primary)] hover:bg-[var(--theme-hover)] text-white py-2.5 rounded-2xl font-bold uppercase tracking-[0.2em] text-[11px] transition-all shadow-lg shadow-[var(--theme-primary)]/20 active:scale-[0.98] flex items-center justify-center gap-3 overflow-hidden"
+            className="btn-primary flex-1 py-2.5 rounded-2xl tracking-[0.2em] text-[11px]"
           >
             <Save size={16} /> 
             <span>{t("update_bg_btn")}</span>

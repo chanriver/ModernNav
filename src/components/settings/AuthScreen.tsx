@@ -70,7 +70,7 @@ export const AuthScreen: React.FC<AuthScreenProps> = ({
         )}
         <button
           type="submit"
-          className="w-full bg-[var(--theme-primary)] hover:bg-[var(--theme-hover)] text-white font-medium py-3 rounded-xl transition-colors flex items-center justify-center gap-2 shadow-lg shadow-[var(--theme-primary)]/20"
+          className="btn-primary w-full py-3 rounded-xl text-base"
         >
           {isVerifying ? (
             <Loader2 className="animate-spin" size={18} />

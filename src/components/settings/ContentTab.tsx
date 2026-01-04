@@ -398,7 +398,7 @@ export const ContentTab: React.FC<ContentTabProps> = ({
     <div className="bg-slate-950/40 border-t border-white/[0.08] p-4 animate-fade-in backdrop-blur-md relative z-20">
       <div className="grid grid-cols-2 gap-4">
         <div className="col-span-2 sm:col-span-1">
-          <label className="block text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-1.5">
+          <label className="label-xs">
             {t("label_title")}
           </label>
           <input
@@ -413,7 +413,7 @@ export const ContentTab: React.FC<ContentTabProps> = ({
           />
         </div>
         <div className="col-span-2 sm:col-span-1 relative" ref={iconPickerRef}>
-          <label className="block text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-1.5">
+          <label className="label-xs">
             {t("label_icon")}
           </label>
           <div className="relative group/icon">
@@ -449,7 +449,7 @@ export const ContentTab: React.FC<ContentTabProps> = ({
           />
         </div>
         <div className="col-span-2 sm:col-span-1">
-          <label className="block text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-1.5">
+          <label className="label-xs">
             {t("label_url")}
           </label>
           <input
@@ -463,7 +463,7 @@ export const ContentTab: React.FC<ContentTabProps> = ({
           />
         </div>
         <div className="col-span-2 sm:col-span-1">
-          <label className="block text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-1.5">
+          <label className="label-xs">
             {t("label_desc")}
           </label>
           <input
@@ -479,13 +479,13 @@ export const ContentTab: React.FC<ContentTabProps> = ({
         <div className="col-span-2 flex gap-2 pt-1">
           <button
             onClick={closeLinkForm}
-            className="flex-1 bg-white/5 hover:bg-white/10 text-slate-300 px-3 py-2 rounded-lg text-xs font-medium transition-colors border border-white/5"
+            className="flex-1 btn-secondary"
           >
             {t("cancel")}
           </button>
           <button
             onClick={handleSaveLink}
-            className="flex-1 bg-[var(--theme-primary)] hover:bg-[var(--theme-hover)] text-white px-3 py-2 rounded-lg text-xs font-medium transition-colors flex items-center justify-center gap-2 shadow-lg shadow-[var(--theme-primary)]/20"
+            className="flex-1 btn-primary"
           >
             {editingLinkId ? <Save size={14} /> : <Plus size={14} />}
             {editingLinkId ? t("update_link_card") : t("add_link_card")}
