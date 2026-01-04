@@ -205,6 +205,25 @@ export const storageService = {
     }
   },
 
+  getLocalData: () => {
+    const categories = safeJsonParse(
+      localStorage.getItem(LS_KEYS.CATEGORIES),
+      INITIAL_CATEGORIES
+    );
+    const background =
+      localStorage.getItem(LS_KEYS.BACKGROUND) || DEFAULT_BACKGROUND;
+    const prefs = safeJsonParse(
+      localStorage.getItem(LS_KEYS.PREFS),
+      DEFAULT_PREFS
+    );
+    return { 
+      categories, 
+      background, 
+      prefs, 
+      isDefaultCode: false // Default to false, will update after sync
+    };
+  },
+
   _lastSaveTime: 0,
 
   fetchAllData: async () => {

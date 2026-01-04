@@ -119,7 +119,7 @@ export const onRequestGet = async ({ env }: { env: Env }) => {
       status: 200,
       headers: {
         "Content-Type": "application/json",
-        "Cache-Control": "no-store",
+        "Cache-Control": "public, max-age=60, stale-while-revalidate=86400",
       },
     });
   } catch (error) {

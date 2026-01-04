@@ -1,38 +1,59 @@
 import { useState, useEffect } from "react";
-import { storageService, DEFAULT_BACKGROUND } from "../services/storage";
+import { storageService } from "../services/storage";
 import { getDominantColor } from "../utils/color";
 import { Category, ThemeMode, UserPreferences } from "../types";
 import { useLanguage } from "../contexts/LanguageContext";
 
 export const useDashboardLogic = () => {
   // State
-  const [loading, setLoading] = useState(true);
-  const [categories, setCategories] = useState<Category[]>([]);
-  const [background, setBackground] = useState<string>(DEFAULT_BACKGROUND);
-  const [cardOpacity, setCardOpacity] = useState<number>(0.1);
-  const [themeColor, setThemeColor] = useState<string>("#6280a3");
-  const [themeColorAuto, setThemeColorAuto] = useState<boolean>(true);
-  const [themeMode, setThemeMode] = useState<ThemeMode>(ThemeMode.Dark);
-  const [isDefaultCode, setIsDefaultCode] = useState(false);
-  const [activeCategory, setActiveCategory] = useState<string>("");
-  const [activeSubCategoryId, setActiveSubCategoryId] = useState<string>("");
+  // Sync check: Get local data immediately
+  const localData = storageService.getLocalData();
+  const hasLocalData = localData.categories.length > 0;
+
+  // State initialization with local data
+  const [loading, setLoading] = useState(!hasLocalData);
+  const [categories, setCategories] = useState<Category[]>(localData.categories);
+  const [background, setBackground] = useState<string>(localData.background);
+  const [cardOpacity, setCardOpacity] = useState<number>(localData.prefs.cardOpacity);
+  const [themeColor, setThemeColor] = useState<string>(localData.prefs.themeColor || "#6280a3");
+  const [themeColorAuto, setThemeColorAuto] = useState<boolean>(localData.prefs.themeColorAuto ?? true);
+  const [themeMode, setThemeMode] = useState<ThemeMode>(localData.prefs.themeMode);
+  const [isDefaultCode, setIsDefaultCode] = useState(localData.isDefaultCode);
+  
+  // Initialize active category
+  const [activeCategory, setActiveCategory] = useState<string>(
+    localData.categories.length > 0 ? localData.categories[0].id : ""
+  );
+  
+  // Helper to find first subcategory
+  const getFirstSubCat = (cats: Category[], catId: string) => {
+    const cat = cats.find(c => c.id === catId);
+    return cat && cat.subCategories.length > 0 ? cat.subCategories[0].id : "";
+  };
+
+  const [activeSubCategoryId, setActiveSubCategoryId] = useState<string>(
+    localData.categories.length > 0 ? getFirstSubCat(localData.categories, localData.categories[0].id) : ""
+  );
+
   // New Layout Preferences
-  const [maxContainerWidth, setMaxContainerWidth] = useState<number>(900);
-  const [cardWidth, setCardWidth] = useState<number>(96);
-  const [cardHeight, setCardHeight] = useState<number>(96);
-  const [gridColumns, setGridColumns] = useState<number>(6);
+  const [maxContainerWidth, setMaxContainerWidth] = useState<number>(localData.prefs.maxContainerWidth ?? 900);
+  const [cardWidth, setCardWidth] = useState<number>(localData.prefs.cardWidth ?? 96);
+  const [cardHeight, setCardHeight] = useState<number>(localData.prefs.cardHeight ?? 96);
+  const [gridColumns, setGridColumns] = useState<number>(localData.prefs.gridColumns ?? 6);
   // New Global Preferences
-  const [siteTitle, setSiteTitle] = useState<string>("ModernNav");
-  const [faviconApi, setFaviconApi] = useState<string>("https://favicon.im/{domain}?larger=true");
-  const [footerGithub, setFooterGithub] = useState<string>("https://github.com/lyan0220");
-  const [footerLinks, setFooterLinks] = useState<{title: string, url: string}[]>([]);
+  const [siteTitle, setSiteTitle] = useState<string>(localData.prefs.siteTitle ?? "ModernNav");
+  const [faviconApi, setFaviconApi] = useState<string>(localData.prefs.faviconApi ?? "https://favicon.im/{domain}?larger=true");
+  const [footerGithub, setFooterGithub] = useState<string>(localData.prefs.footerGithub ?? "https://github.com/lyan0220");
+  const [footerLinks, setFooterLinks] = useState<{title: string, url: string}[]>(localData.prefs.footerLinks ?? []);
 
   const { language, setLanguage } = useLanguage();
 
-  // Initial Data Fetch
+  // Background Sync Data Fetch
   useEffect(() => {
     const initData = async () => {
-      setLoading(true);
+      // If we have local data, we don't show loading spinner, but we still digest the promise
+      if (!hasLocalData) setLoading(true);
+      
       try {
         const data = await storageService.fetchAllData();
 
@@ -64,10 +85,16 @@ export const useDashboardLogic = () => {
 
         setThemeColor(finalColor);
 
-        // Set Active Category
-        if (data.categories.length > 0) {
-          setActiveCategory(data.categories[0].id);
+        // Update Active Category only if currently empty or invalid
+        // (Optional: Logic to keep user on current category effectively handled by state persistence if we wanted, 
+        // but here we just ensure validity if data changed structure)
+        
+        // Note: We generally don't want to reset active category while user is browsing if sync finishes late.
+        // But if we had NO local data, we must set it.
+        if (!hasLocalData && data.categories.length > 0) {
+           setActiveCategory(data.categories[0].id);
         }
+
       } catch (e) {
         console.error("Failed to load app data", e);
       } finally {
