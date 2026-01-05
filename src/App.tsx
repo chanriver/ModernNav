@@ -557,16 +557,24 @@ ${
           <SearchBar themeMode={themeMode} />
         </section>
 {/* 在 App.tsx 的 SearchBar 容器下方 */}
-<div className="w-full flex flex-col items-center mt-[-55px] mb-8 relative z-[60]">
-  {/* 去掉背景框，直接通过文字阴影强化反差 */}
+<div className="w-full flex flex-col items-center mt-[-60px] mb-8 relative z-[60]">
+  
+  {/* 核心改动：使用径向渐变作为“无形”背景 */}
   <div className={`
-    transition-all duration-500
+    relative px-12 py-4 flex items-center justify-center transition-all duration-500
+    /* 使用径向渐变：中心稍深，向四周完全透明，形成无形的暗场 */
     ${isDark 
-      ? "text-white [text-shadow:0_2px_10px_rgba(0,0,0,0.8),0_1px_3px_rgba(0,0,0,1)]" 
-      : "text-slate-900 [text-shadow:0_1px_8px_rgba(255,255,255,0.8)]"
+      ? "bg-[radial-gradient(circle,rgba(0,0,0,0.6)_0%,transparent_70%)]" 
+      : "bg-[radial-gradient(circle,rgba(255,255,255,0.7)_0%,transparent_70%)]"
     }
   `}>
-    <ConsoleLog />
+    {/* 增加文字本身的粗细和亮度 */}
+    <div className={`
+      scale-110 /* 整体稍微放大一点，增加视觉分量 */
+      ${isDark ? "text-white font-semibold" : "text-slate-900 font-bold"}
+    `}>
+      <ConsoleLog />
+    </div>
   </div>
   
   {/* 装饰短线 */}
