@@ -557,23 +557,25 @@ ${
           <SearchBar themeMode={themeMode} />
         </section>
 {/* 在 App.tsx 的 SearchBar 容器下方 */}
-<div className="w-full flex flex-col items-center mt-[-55px] mb-8 relative z-[60]">
+<div className="w-full flex flex-col items-center mt-[-60px] mb-8 relative z-[60]">
   
-  {/* 纯净文字层：不加任何背景色，只靠文字自身的样式 */}
   <div className={`
-    px-4 text-center transition-all duration-300
+    px-6 text-center select-none
+    /* 核心逻辑：无论背景多乱，通过多重硬阴影强行抠出文字轮廓 */
     ${isDark 
-      ? "text-white font-black drop-shadow-[0_2px_4px_rgba(0,0,0,0.9)]" 
-      : "text-slate-900 font-black drop-shadow-[0_1px_2px_rgba(255,255,255,1)]"
+      ? "text-white [text-shadow:1px_1px_0_#000,-1px_-1px_0_#000,1px_-1px_0_#000,-1px_1px_0_#000,0_2px_10px_rgba(0,0,0,1)]" 
+      : "text-black [text-shadow:1px_1px_0_#fff,-1px_-1px_0_#fff,1px_-1px_0_#fff,-1px_1px_0_#fff,0_2px_8px_rgba(255,255,255,1)]"
     }
   `}
   style={{ 
-    fontSize: '1.1rem',
-    letterSpacing: '-0.01em', // 紧凑的字间距更有力量感
-    WebkitFontSmoothing: 'antialiased'
+    fontSize: '1.2rem',
+    fontWeight: '900', // 使用最高字重
+    lineHeight: '1.4',
+    // 强制增加对比度
+    filter: isDark ? 'brightness(1.2)' : 'contrast(1.2)',
   }}>
     <ConsoleLog />
-  </div>  
+  </div> 
   {/* 装饰短线 */}
 {/*  <div 
     className="w-16 h-[2px] mt-4 opacity-30 rounded-full"
