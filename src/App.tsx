@@ -557,24 +557,22 @@ ${
           <SearchBar themeMode={themeMode} />
         </section>
 {/* 在 App.tsx 的 SearchBar 容器下方 */}
-<div className="w-full flex flex-col items-center mt-[-60px] mb-8 relative z-[60]">
+<div className="w-full flex flex-col items-center mt-[-60px] mb-8 relative z-[60] isolate">
   
-  {/* 核心改动：使用径向渐变作为“无形”背景 */}
-  <div className={`
-    relative px-12 py-4 flex items-center justify-center transition-all duration-500
-    /* 使用径向渐变：中心稍深，向四周完全透明，形成无形的暗场 */
-    ${isDark 
-      ? "bg-[radial-gradient(circle,rgba(0,0,0,0.6)_0%,transparent_70%)]" 
-      : "bg-[radial-gradient(circle,rgba(255,255,255,0.7)_0%,transparent_70%)]"
-    }
-  `}>
-    {/* 增加文字本身的粗细和亮度 */}
+  {/* 文字容器：使用 mix-blend-mode 实现自动反差 */}
+  <div className="relative py-2 transition-all duration-500">
+    
+    {/* 1. 核心反差层：让文字颜色永远与背景相反 */}
     <div className={`
-      scale-110 /* 整体稍微放大一点，增加视觉分量 */
-      ${isDark ? "text-white font-semibold" : "text-slate-900 font-bold"}
+      text-lg md:text-xl font-bold tracking-wide
+      mix-blend-difference invert brightness-200
+      ${isDark ? "text-white" : "text-slate-200"}
     `}>
       <ConsoleLog />
     </div>
+
+    {/* 2. 可选：底部的增强微光（非常淡，几乎不可见，仅用于增加深度感） */}
+    <div className="absolute inset-0 -z-10 bg-white/5 blur-2xl rounded-full"></div>
   </div>
   
   {/* 装饰短线 */}
