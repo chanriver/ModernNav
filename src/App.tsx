@@ -557,9 +557,21 @@ ${
           <SearchBar themeMode={themeMode} />
         </section>
 {/* 在 App.tsx 的 SearchBar 容器下方 */}
-<div className="w-full flex flex-col items-center mt-[-60px] mb-6">
-  {/* 名言组件 - 居中显示 */}
-  <ConsoleLog />
+<div className="w-full flex flex-col items-center mt-[-45px] mb-10 relative z-[60]">
+  {/* 名言组件容器 - 增加反差底色 */}
+  <div className={`
+    px-8 py-3 rounded-2xl transition-all duration-500
+    ${isDark 
+      ? "bg-black/30 border border-white/10 shadow-[0_8px_32px_rgba(0,0,0,0.3)]" 
+      : "bg-white/40 border border-white/20 shadow-[0_8px_32px_rgba(255,255,255,0.1)]"
+    }
+  `}
+  style={{ 
+    backdropFilter: 'blur(12px)', 
+    WebkitBackdropFilter: 'blur(12px)' 
+  }}>
+    <ConsoleLog />
+  </div>
   
   {/* 装饰短线 */}
 {/*  <div 
