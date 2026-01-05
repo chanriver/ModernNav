@@ -306,31 +306,43 @@ const App: React.FC = () => {
   );
 
   const glassLayerSheen = (
-    <div
-      className={`absolute inset-0 pointer-events-none z-0 bg-gradient-to-br ${
-        isDark
-          ? "from-white/[0.02] via-transparent to-black/[0.1]"
-          : "from-white/[0.3] via-transparent to-transparent"
-      } rounded-full`}
-    />
-  );
+  <div
+    className="absolute inset-0 pointer-events-none z-0 rounded-full"
+    style={{
+      background: isDark
+        ? "linear-gradient(145deg, rgba(255,255,255,0.18), transparent 40%, rgba(0,0,0,0.35))"
+        : "linear-gradient(145deg, rgba(255,255,255,0.9), transparent 45%)",
+    }}
+  />
+);
 
-  const islandContainerClass = `relative flex items-center justify-center p-1.5 rounded-full border transition-all duration-500 ease-[cubic-bezier(0.32,0.72,0,1)] ${
-    isDark
-      ? "bg-slate-900/60 border-white/10 shadow-[0_20px_40px_-10px_rgba(0,0,0,0.6)]"
-      : "bg-white/60 border-white/40 shadow-[0_20px_40px_-10px_rgba(0,0,0,0.15)]"
-  }`;
+
+const islandContainerClass = `relative flex items-center justify-center p-1.5 rounded-full border transition-all duration-500
+${
+  isDark
+    ? "border-white/10 shadow-[0_30px_60px_-15px_rgba(0,0,0,0.7)]"
+    : "border-white/40 shadow-[0_30px_60px_-15px_rgba(0,0,0,0.2)]"
+}`;
+
 
   const islandStyle = {
-    backdropFilter: `blur(${adaptiveGlassBlur}px) saturate(180%)`,
-    WebkitBackdropFilter: `blur(${adaptiveGlassBlur}px) saturate(180%)`,
-  };
+  backdropFilter: `blur(${adaptiveGlassBlur}px) saturate(200%)`,
+  WebkitBackdropFilter: `blur(${adaptiveGlassBlur}px) saturate(200%)`,
+  background: isDark
+    ? `rgba(var(--theme-primary-rgb), 0.12)`
+    : `rgba(255,255,255,0.65)`,
+};
 
-  const slidingPillClass = `absolute top-0 bottom-0 rounded-full transition-all duration-300 ease-[cubic-bezier(0.2,0,0,1)] pointer-events-none ${
-    isDark
-      ? "bg-white/10 shadow-[inset_0_1px_0_0_rgba(255,255,255,0.05)] border border-white/5"
-      : "bg-white shadow-[0_2px_8px_-2px_rgba(0,0,0,0.12)] border border-black/5"
-  }`;
+
+  const slidingPillClass = `
+absolute top-0 bottom-0 rounded-full pointer-events-none
+transition-all duration-300 ease-[cubic-bezier(0.2,0,0,1)]
+${
+  isDark
+    ? "bg-gradient-to-b from-white/25 via-white/10 to-black/20 border border-white/20 shadow-[inset_0_1px_0_rgba(255,255,255,0.25),0_6px_20px_rgba(0,0,0,0.35)]"
+    : "bg-gradient-to-b from-white via-white/70 to-white/40 border border-black/5 shadow-[0_6px_20px_rgba(0,0,0,0.15)]"
+}`;
+
 
   const categoryButtonBase = `
     relative z-10 flex items-center gap-1.5 px-4 py-2 rounded-full transition-colors duration-300 cursor-pointer select-none
