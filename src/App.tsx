@@ -557,43 +557,23 @@ ${
           <SearchBar themeMode={themeMode} />
         </section>
 {/* 在 App.tsx 的 SearchBar 容器下方 */}
-<div className="w-full flex flex-col items-center mt-[-65px] mb-8 relative z-[60]">
+<div className="w-full flex flex-col items-center mt-[-55px] mb-8 relative z-[60]">
   
-  {/* 这里的容器不设边框，只做极轻微的背景遮罩来压制干扰 */}
-  <div className="relative px-10 py-4 group">
-    
-    {/* 1. 动态底幕：只有在文字下方的一小块区域进行超强模糊，彻底消除背景纹理干扰 */}
-    <div 
-      className="absolute inset-0 -z-10 rounded-3xl opacity-100"
-      style={{ 
-        backdropFilter: 'blur(16px) saturate(180%)',
-        WebkitBackdropFilter: 'blur(16px) saturate(180%)',
-        // 淡淡的径向渐变，中心稍微收紧背景，边缘消失
-        maskImage: 'radial-gradient(circle, black 30%, transparent 80%)',
-        WebkitMaskImage: 'radial-gradient(circle, black 30%, transparent 80%)'
-      }}
-    ></div>
-
-    {/* 2. 增强文字：通过多重滤镜实现绝对清晰度 */}
-    <div className={`
-      relative transition-all duration-500
-      text-center leading-relaxed
-      ${isDark 
-        ? "text-white/95 drop-shadow-[0_2px_12px_rgba(0,0,0,0.8)]" 
-        : "text-slate-900/90 drop-shadow-[0_1px_8px_rgba(255,255,255,1)]"
-      }
-    `}
-    style={{
-      // 增加字间距和字体平滑
-      letterSpacing: '0.02em',
-      WebkitFontSmoothing: 'antialiased'
-    }}>
-      <div className="scale-105 transform-gpu font-medium">
-        <ConsoleLog />
-      </div>
-    </div>
-  </div>
-  
+  {/* 纯净文字层：不加任何背景色，只靠文字自身的样式 */}
+  <div className={`
+    px-4 text-center transition-all duration-300
+    ${isDark 
+      ? "text-white font-black drop-shadow-[0_2px_4px_rgba(0,0,0,0.9)]" 
+      : "text-slate-900 font-black drop-shadow-[0_1px_2px_rgba(255,255,255,1)]"
+    }
+  `}
+  style={{ 
+    fontSize: '1.1rem',
+    letterSpacing: '-0.01em', // 紧凑的字间距更有力量感
+    WebkitFontSmoothing: 'antialiased'
+  }}>
+    <ConsoleLog />
+  </div>  
   {/* 装饰短线 */}
 {/*  <div 
     className="w-16 h-[2px] mt-4 opacity-30 rounded-full"
