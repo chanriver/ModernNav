@@ -152,7 +152,7 @@ export const CategoryNav: React.FC<CategoryNavProps> = ({
         {glassLayerRim}
         {glassLayerSheen}
 
-        <div className="relative z-10 flex items-center gap-1 flex-wrap justify-center max-w-full px-1">
+        <div className="relative z-10 flex items-center gap-2 overflow-x-auto sm:overflow-visible whitespace-nowrap sm:whitespace-normal px-2 sm:px-1 no-scrollbar">
           {/* SECTION 1: Categories */}
           <div className="relative flex items-center" ref={navTrackRef}>
             <div
