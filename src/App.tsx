@@ -409,6 +409,11 @@ ${
     scrollbar-width: none;
     overflow-x: auto;
   }
+/* 给导航滑动区域增加边缘渐变感，提示还有内容 */
+.no-scrollbar {
+  mask-image: linear-gradient(to right, transparent, black 5%, black 95%, transparent);
+  -webkit-mask-image: linear-gradient(to right, transparent, black 5%, black 95%, transparent);
+}
 
   /* 适配手机端的小字体优化 */
   @media (max-width: 640px) {
