@@ -552,6 +552,9 @@ ${
                       </div>
                     )}
                   </div>
+                );
+              })}
+            </div>
 
             {/* SECTION 2: Separator */}
             <div
