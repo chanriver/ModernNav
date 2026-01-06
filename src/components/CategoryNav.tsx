@@ -44,10 +44,9 @@ export const CategoryNav: React.FC<CategoryNavProps> = ({
       if (activeTab && navTrackRef.current) {
         const trackRect = navTrackRef.current.getBoundingClientRect();
         const tabRect = activeTab.getBoundingClientRect();
-	const tabRect = activeTab.getBoundingClientRect();
 
         setNavPillStyle({
-          left: tabRect.left - trackRect.left + track.scrollLeft,
+          left: tabRect.left - trackRect.left,
           width: tabRect.width,
           opacity: 1,
         });
@@ -113,7 +112,7 @@ export const CategoryNav: React.FC<CategoryNavProps> = ({
   };
 
   const actionButtonClass = `
-    relative flex items-center justify-center p-2.5 rounded-full transition-all duration-200 ease-out flex-shrink-0
+    relative flex items-center justify-center p-2.5 rounded-full transition-all duration-200 ease-out
     active:scale-90 active:shadow-inner
     hover:bg-[var(--theme-primary)]/20 hover:text-current hover:border-[var(--theme-primary)]/10
     border border-transparent
@@ -153,23 +152,7 @@ export const CategoryNav: React.FC<CategoryNavProps> = ({
         {glassLayerRim}
         {glassLayerSheen}
 
-        {/* 外层：控制居中（桌面） / 左对齐（手机） */}
-<div className="relative z-10 w-full overflow-hidden">
-  <div className="mx-auto max-w-full md:max-w-fit">
-    
-    {/* 内层：真正负责横向滚动 */}
-    <div
-      className="
-        flex items-center gap-1
-        overflow-x-auto no-scrollbar
-        scroll-smooth
-        px-1
-      "
-      style={{
-        WebkitOverflowScrolling: "touch", // iOS 惯性滚动
-      }}
-    >
-	<div className="flex flex-nowrap items-center gap-1">
+        <div className="relative z-10 flex items-center gap-1 flex-wrap justify-center max-w-full px-1">
           {/* SECTION 1: Categories */}
           <div className="relative flex items-center" ref={navTrackRef}>
             <div
