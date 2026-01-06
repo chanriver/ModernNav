@@ -506,31 +506,43 @@ ${
                       )}
                     </button>
                     
+                    {/* --- 二级菜单完整适配版 --- */}
                     {!hasSingleDefault && (
-                      <div className="absolute top-full left-1/2 -translate-x-1/2 pt-4 hidden group-hover:block z-[100] w-34 animate-fade-in origin-top">
+                      <div className={`
+                        /* 电脑端样式：绝对定位、悬浮出现 */
+                        md:absolute md:top-full md:left-1/2 md:-translate-x-1/2 md:pt-4 md:w-34 md:z-[100] md:origin-top
+                        /* 手机端样式：固定在导航栏正下方，不再受限于父级容器的 overflow */
+                        fixed left-0 right-0 top-[76px] px-4 py-2
+                        /* 交互逻辑：电脑端 hover 出现，手机端只有 isActive 时才 block */
+                        ${isActive ? "block" : "hidden md:group-hover:block"} 
+                        animate-fade-in
+                      `}>
                         <div
-                          className={`${dropdownClasses} rounded-xl p-1 flex flex-col gap-0.5 overflow-hidden ring-1 ring-white/5 shadow-2xl`}
+                          className={`${dropdownClasses} rounded-xl p-1 flex flex-row md:flex-col gap-1 overflow-x-auto no-scrollbar shadow-2xl ring-1 ring-white/5`}
                         >
                           {cat.subCategories.length > 0 ? (
-                            cat.subCategories.map((sub) => (
-                              <button
-                                key={sub.id}
-                                onClick={(e) => {
-                                  e.stopPropagation();
-                                  handleSubCategoryClick(cat.id, sub.id);
-                                }}
-                                className={getDropdownItemClass(
-                                  activeCategory === cat.id &&
-                                    activeSubCategoryId === sub.id
-                                )}
-                              >
-                                <span className="truncate">{sub.title}</span>
-                                {activeCategory === cat.id &&
-                                  activeSubCategoryId === sub.id && (
-                                    <div className="w-1 h-1 rounded-full bg-white shadow-sm"></div>
-                                  )}
-                              </button>
-                            ))
+                            cat.subCategories.map((sub) => {
+                              const isSubActive = activeCategory === cat.id && activeSubCategoryId === sub.id;
+                              return (
+                                <button
+                                  key={sub.id}
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    handleSubCategoryClick(cat.id, sub.id);
+                                  }}
+                                  className={`
+                                    flex-shrink-0 px-3 py-1.5 rounded-md text-xs transition-all duration-200 flex items-center gap-2 whitespace-nowrap
+                                    ${isSubActive 
+                                      ? "bg-[var(--theme-primary)] text-white font-medium shadow-md scale-105" 
+                                      : isDark ? "text-white/70 hover:bg-white/10" : "text-slate-700 hover:bg-black/5"
+                                    }
+                                  `}
+                                >
+                                  <span>{sub.title}</span>
+                                  {isSubActive && <div className="w-1 h-1 rounded-full bg-white animate-pulse"></div>}
+                                </button>
+                              );
+                            })
                           ) : (
                             <div className={`px-3 py-2 text-[10px] text-center italic ${isDark ? "text-white/40" : "text-slate-400"}`}>
                               {t("no_submenus")}
@@ -540,9 +552,6 @@ ${
                       </div>
                     )}
                   </div>
-                );
-              })}
-            </div>
 
             {/* SECTION 2: Separator */}
             <div
