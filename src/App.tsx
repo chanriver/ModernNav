@@ -439,35 +439,35 @@ ${
 
           <div className="relative z-10 flex items-center gap-1 flex-wrap justify-center max-w-full px-1">
             {/* SECTION 1: Categories */}
-            <div className="relative flex items-center" ref={navTrackRef}>
-              <div
-                className={slidingPillClass}
-                style={{
-                  left: navPillStyle.left,
-                  width: navPillStyle.width,
-                  opacity: navPillStyle.opacity,
-                  height: "100%",
-                }}
-              />
-              {categories.map((cat) => {
-                const hasSingleDefault =
-                  cat.subCategories.length === 1 &&
-                  cat.subCategories[0].title === "Default";
-                const isActive = activeCategory === cat.id;
-                return (
-                  <div key={cat.id} className="relative group">
-                    <button
-                      ref={(el) => {
-                        tabsRef.current[cat.id] = el;
-                      }}
-                      onClick={() => handleMainCategoryClick(cat)}
-                      className={`${categoryButtonBase} ${categoryButtonColors(
-                        isActive
-                      )}`}
-                    >
-                      <span className="truncate max-w-[120px] relative z-10">
-                        {cat.title}
-                      </span>
+            <div 
+  className="relative flex items-center overflow-x-auto no-scrollbar scroll-smooth" 
+  ref={navTrackRef}
+  style={{ 
+    maxWidth: 'calc(100vw - 120px)', // 给右侧动作按钮留出空间
+    WebkitOverflowScrolling: 'touch' // 让 iOS 滑动更顺滑
+  }}
+>
+  <div
+    className={slidingPillClass}
+    style={{
+      left: navPillStyle.left,
+      width: navPillStyle.width,
+      opacity: navPillStyle.opacity,
+      height: "100%",
+    }}
+  />
+  {categories.map((cat) => (
+    <div key={cat.id} className="relative group flex-shrink-0"> {/* 增加 flex-shrink-0 防止文字被挤压 */}
+      <button
+        ref={(el) => {
+          tabsRef.current[cat.id] = el;
+        }}
+        onClick={() => handleMainCategoryClick(cat)}
+        className={`${categoryButtonBase} ${categoryButtonColors(activeCategory === cat.id)} whitespace-nowrap`} // 增加 whitespace-nowrap 强制文字不换行
+      >
+        <span className="relative z-10">
+          {cat.title}
+        </span>
                       {!hasSingleDefault && (
                         <ChevronDown
                           size={14}
