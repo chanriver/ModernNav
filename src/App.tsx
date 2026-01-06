@@ -392,14 +392,31 @@ ${
       <ToastContainer />
 
       <style>{`
-        :root {
-          --theme-primary: ${themeColor};
-          --theme-hover: color-mix(in srgb, ${themeColor}, black 10%);
-          --theme-active: color-mix(in srgb, ${themeColor}, black 20%);
-          --theme-light: color-mix(in srgb, ${themeColor}, white 30%);
-          --glass-blur: ${adaptiveGlassBlur}px;
-        }
-      `}</style>
+  :root {
+    --theme-primary: ${themeColor};
+    --theme-hover: color-mix(in srgb, ${themeColor}, black 10%);
+    --theme-active: color-mix(in srgb, ${themeColor}, black 20%);
+    --theme-light: color-mix(in srgb, ${themeColor}, white 30%);
+    --glass-blur: ${adaptiveGlassBlur}px;
+  }
+
+  /* --- 新增：隐藏导航滚动条 --- */
+  .no-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
+  .no-scrollbar {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+    overflow-x: auto;
+  }
+
+  /* 适配手机端的小字体优化 */
+  @media (max-width: 640px) {
+    .nav-island-container {
+      max-width: 95vw; /* 让岛更宽一点 */
+    }
+  }
+`}</style>
 
       {/* Background Layer */}
       <div className="fixed inset-0 z-0">
@@ -440,34 +457,40 @@ ${
           <div className="relative z-10 flex items-center gap-1 flex-wrap justify-center max-w-full px-1">
             {/* SECTION 1: Categories */}
             <div 
-  className="relative flex items-center overflow-x-auto no-scrollbar scroll-smooth" 
-  ref={navTrackRef}
-  style={{ 
-    maxWidth: 'calc(100vw - 120px)', // 给右侧动作按钮留出空间
-    WebkitOverflowScrolling: 'touch' // 让 iOS 滑动更顺滑
-  }}
->
-  <div
-    className={slidingPillClass}
-    style={{
-      left: navPillStyle.left,
-      width: navPillStyle.width,
-      opacity: navPillStyle.opacity,
-      height: "100%",
-    }}
-  />
-  {categories.map((cat) => (
-    <div key={cat.id} className="relative group flex-shrink-0"> {/* 增加 flex-shrink-0 防止文字被挤压 */}
-      <button
-        ref={(el) => {
-          tabsRef.current[cat.id] = el;
-        }}
-        onClick={() => handleMainCategoryClick(cat)}
-        className={`${categoryButtonBase} ${categoryButtonColors(activeCategory === cat.id)} whitespace-nowrap`} // 增加 whitespace-nowrap 强制文字不换行
-      >
-        <span className="relative z-10">
-          {cat.title}
-        </span>
+              ref={navTrackRef}
+              className="relative flex items-center overflow-x-auto no-scrollbar scroll-smooth flex-1"
+              style={{ 
+                maxWidth: 'calc(100vw - 160px)', 
+                WebkitOverflowScrolling: 'touch' 
+              }}
+            >
+              <div
+                className={slidingPillClass}
+                style={{
+                  left: navPillStyle.left,
+                  width: navPillStyle.width,
+                  opacity: navPillStyle.opacity,
+                  height: "100%",
+                }}
+              />
+              {categories.map((cat) => {
+                const hasSingleDefault =
+                  cat.subCategories.length === 1 &&
+                  cat.subCategories[0].title === "Default";
+                const isActive = activeCategory === cat.id;
+                
+                return (
+                  <div key={cat.id} className="relative group flex-shrink-0">
+                    <button
+                      ref={(el) => {
+                        tabsRef.current[cat.id] = el;
+                      }}
+                      onClick={() => handleMainCategoryClick(cat)}
+                      className={`${categoryButtonBase} ${categoryButtonColors(isActive)} whitespace-nowrap`}
+                    >
+                      <span className="truncate max-w-[100px] sm:max-w-[120px] relative z-10">
+                        {cat.title}
+                      </span>
                       {!hasSingleDefault && (
                         <ChevronDown
                           size={14}
@@ -477,6 +500,7 @@ ${
                         />
                       )}
                     </button>
+                    
                     {!hasSingleDefault && (
                       <div className="absolute top-full left-1/2 -translate-x-1/2 pt-4 hidden group-hover:block z-[100] w-34 animate-fade-in origin-top">
                         <div
@@ -503,11 +527,7 @@ ${
                               </button>
                             ))
                           ) : (
-                            <div
-                              className={`px-3 py-2 text-[10px] text-center italic ${
-                                isDark ? "text-white/40" : "text-slate-400"
-                              }`}
-                            >
+                            <div className={`px-3 py-2 text-[10px] text-center italic ${isDark ? "text-white/40" : "text-slate-400"}`}>
                               {t("no_submenus")}
                             </div>
                           )}
