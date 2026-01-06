@@ -415,10 +415,23 @@ ${
   -webkit-mask-image: linear-gradient(to right, transparent, black 5%, black 95%, transparent);
 }
 
-  /* 适配手机端的小字体优化 */
-  @media (max-width: 640px) {
+ /* 适配手机端的导航与二级菜单优化 */
+  @media (max-width: 768px) {
     .nav-island-container {
-      max-width: 95vw; /* 让岛更宽一点 */
+      max-width: 98vw; /* 手机端占据更多宽度 */
+    }
+
+    /* 确保二级菜单展开时，下方的内容（搜索框等）有足够的间距，不被遮挡 */
+    nav {
+      margin-bottom: 45px; /* 为固定的二级菜单留出空间 */
+      transition: margin-bottom 0.3s ease;
+    }
+
+    /* 优化分类按钮在手机端的大小 */
+    .category-button-base {
+      padding-left: 0.8rem;
+      padding-right: 0.8rem;
+      font-size: 0.85rem;
     }
   }
 `}</style>
