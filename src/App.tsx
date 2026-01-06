@@ -58,8 +58,6 @@ const App: React.FC = () => {
   };
 
   // --- Effects ---
-
-  // 1. 初始化数据
   useEffect(() => {
     const initData = async () => {
       setLoading(true);
@@ -90,13 +88,11 @@ const App: React.FC = () => {
     initData();
   }, []);
 
-  // 2. 主题变量同步
   useEffect(() => {
     document.documentElement.style.setProperty("--theme-primary", themeColor);
     document.documentElement.style.setProperty("--theme-primary-rgb", hexToRgb(themeColor));
   }, [themeColor]);
 
-  // 3. 灵动岛滑块更新
   useEffect(() => {
     const updatePill = () => {
       const activeTab = tabsRef.current[activeCategory];
@@ -118,7 +114,7 @@ const App: React.FC = () => {
     };
   }, [activeCategory, categories, loading]);
 
-  // 4. 滚动联动监听 (Intersection Observer)
+  // 滚动联动监听
   useEffect(() => {
     if (loading || categories.length === 0) return;
 
@@ -170,29 +166,20 @@ const App: React.FC = () => {
   const toggleTheme = () => {
     const newTheme = themeMode === ThemeMode.Dark ? ThemeMode.Light : ThemeMode.Dark;
     setThemeMode(newTheme);
-    storageService.savePreferences({ cardOpacity, themeColor, themeMode: newTheme, themeColorAuto });
   };
 
   const toggleLanguage = () => setLanguage(language === "en" ? "zh" : "en");
 
-  if (loading) {
-    return (
-      <div className="min-h-screen bg-slate-900 flex items-center justify-center flex-col gap-4">
-        <Loader2 className="animate-spin text-white/40" size={40} />
-      </div>
-    );
-  }
+  if (loading) return <div className="min-h-screen bg-slate-900 flex items-center justify-center"><Loader2 className="animate-spin text-white/40" size={40} /></div>;
 
-  // --- UI 组件 ---
-  const adaptiveGlassBlur = isDark ? 50 : 30;
   const islandStyle = {
-    backdropFilter: `blur(${adaptiveGlassBlur}px) saturate(200%)`,
-    WebkitBackdropFilter: `blur(${adaptiveGlassBlur}px) saturate(200%)`,
+    backdropFilter: `blur(40px) saturate(200%)`,
+    WebkitBackdropFilter: `blur(40px) saturate(200%)`,
     background: isDark ? `rgba(var(--theme-primary-rgb), 0.12)` : `rgba(255,255,255,0.65)`
   };
 
   return (
-    <div className={`min-h-screen relative selection:bg-[var(--theme-primary)] selection:text-white flex flex-col ${isDark ? "text-slate-100" : "text-slate-800"}`}>
+    <div className={`min-h-screen relative flex flex-col ${isDark ? "text-slate-100" : "text-slate-800"}`}>
       <ToastContainer />
       <style>{`
         :root { --theme-primary: ${themeColor}; }
@@ -201,20 +188,85 @@ const App: React.FC = () => {
         .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; overflow-x: auto; }
       `}</style>
 
-      {/* 背景层 */}
+      {/* 背景 */}
       <div className="fixed inset-0 -z-40">
         {background.startsWith("http") ? (
-          <img src={background} className="w-full h-full object-cover" style={{ opacity: isDark ? 0.8 : 1 }} alt="bg" />
+          <img src={background} className="w-full h-full object-cover" style={{ opacity: isDark ? 0.8 : 1 }} alt="" />
         ) : (
-          <div className="w-full h-full" style={{ background: background }} />
+          <div className="w-full h-full" style={{ background }} />
         )}
       </div>
 
-      {/* 导航栏 */}
-      <nav className="flex flex-col justify-center items-center py-6 px-4 relative z-[100] text-sm font-medium">
-        <div className={`relative flex items-center justify-center p-1.5 rounded-full border transition-all ${isDark ? "border-white/10 shadow-2xl" : "border-white/40 shadow-xl"}`} style={islandStyle}>
-          <div className="relative z-10 flex items-center gap-1 flex-wrap justify-center px-1">
-            <div ref={navTrackRef} className="relative flex items-center overflow-x-auto no-scrollbar scroll-smooth" style={{ maxWidth: 'calc(100vw - 160px)' }}>
-              <div className="absolute top-0 bottom-0 rounded-full transition-all duration-300 pointer-events-none" style={{ left: navPillStyle.left, width: navPillStyle.width, opacity: navPillStyle.opacity, height: "100%", background: isDark ? 'rgba(255,255,255,0.15)' : 'rgba(255,255,255,0.8)' }} />
-              {categories.map((cat) => (
-                <button key={cat.id} ref={(el) => { tabsRef.current[cat.id] = el; }} onClick={() => handleMainCategoryClick(cat)} className={`relative z-10 px-4 py-2 rounded-full whitespace-nowrap ${activeCategory === cat.id ? (isDark ? "text-white" : "text-slate-900") : "text-white/
+      {/* 导航 */}
+      <nav className="flex flex-col justify-center items-center py-6 px-4 sticky top-0 z-[100]">
+        <div className={`relative flex items-center p-1.5 rounded-full border transition-all ${isDark ? "border-white/10 shadow-2xl" : "border-white/40 shadow-xl"}`} style={islandStyle}>
+          <div ref={navTrackRef} className="relative flex items-center overflow-x-auto no-scrollbar px-1" style={{ maxWidth: 'calc(100vw - 160px)' }}>
+            <div className="absolute top-0 bottom-0 rounded-full transition-all duration-300 pointer-events-none" style={{ left: navPillStyle.left, width: navPillStyle.width, opacity: navPillStyle.opacity, height: "100%", background: isDark ? 'rgba(255,255,255,0.15)' : 'rgba(255,255,255,0.8)' }} />
+            {categories.map((cat) => (
+              <button key={cat.id} ref={(el) => { tabsRef.current[cat.id] = el; }} onClick={() => handleMainCategoryClick(cat)} className={`relative z-10 px-4 py-2 rounded-full whitespace-nowrap transition-colors ${activeCategory === cat.id ? (isDark ? "text-white" : "text-slate-900") : "text-white/50"}`}>
+                {cat.title}
+              </button>
+            ))}
+          </div>
+          <div className={`w-[1px] h-5 mx-2 ${isDark ? "bg-white/10" : "bg-slate-400/20"}`} />
+          <div className="flex items-center gap-1">
+            <button onClick={toggleLanguage} className="p-2 rounded-full hover:bg-white/10"><Globe size={18} /></button>
+            <button onClick={toggleTheme} className="p-2 rounded-full hover:bg-white/10">{isDark ? <Moon size={18} /> : <Sun size={18} />}</button>
+            <button onClick={() => setIsModalOpen(true)} className="p-2 rounded-full hover:bg-white/10"><Settings size={18} /></button>
+          </div>
+        </div>
+
+        {/* 二级联动菜单 */}
+        {(() => {
+          const activeCat = categories.find(c => c.id === activeCategory);
+          if (!activeCat || activeCat.subCategories.length <= 1) return null;
+          return (
+            <div className="mt-4 flex gap-1.5 p-1.5 rounded-2xl overflow-x-auto no-scrollbar bg-black/10 backdrop-blur-md">
+              {activeCat.subCategories.map((sub) => (
+                <button key={sub.id} onClick={() => handleSubCategoryClick(activeCategory, sub.id)} className={`px-4 py-2 rounded-xl text-xs transition-all whitespace-nowrap ${activeSubCategoryId === sub.id ? "bg-[var(--theme-primary)] text-white shadow-lg" : "text-white/60 hover:bg-white/10"}`}>
+                  {sub.title}
+                </button>
+              ))}
+            </div>
+          );
+        })()}
+      </nav>
+
+      <div className="container mx-auto px-4 flex-1 flex flex-col items-center pt-8 max-w-[1200px]">
+        <section className="w-full mb-14"><SearchBar themeMode={themeMode} /></section>
+        <div className="w-full flex flex-col items-center mt-[-60px] mb-8"><ConsoleLog /></div>
+
+        <main className="w-full pb-64 space-y-16">
+          {categories.filter(c => c.id === activeCategory).map(cat => (
+            <div key={cat.id} className="animate-fade-in">
+              {cat.subCategories.map(sub => (
+                <section key={sub.id} id={`subcat-${cat.id}-${sub.id}`} data-subid={sub.id} className="sub-category-section scroll-mt-[200px] mb-16">
+                  <div className="flex items-center gap-6 mb-8">
+                    <div className="h-[1px] flex-1 bg-gradient-to-r from-transparent to-white/20" />
+                    <h3 className={`text-lg font-bold px-6 py-2 rounded-full transition-all ${activeSubCategoryId === sub.id ? "ring-2 ring-[var(--theme-primary)] bg-[var(--theme-primary)]/10" : "opacity-80"}`}>
+                      {sub.title === "Default" ? cat.title : sub.title}
+                    </h3>
+                    <div className="h-[1px] flex-1 bg-gradient-to-l from-transparent to-white/20" />
+                  </div>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 xl:grid-cols-5 gap-4">
+                    {sub.items.map(link => (
+                      <GlassCard key={link.id} opacity={cardOpacity} themeMode={themeMode} onClick={() => window.open(link.url, "_blank")} className="h-20 flex items-center px-5 gap-5 group">
+                        <div className="flex-shrink-0 transition-transform group-hover:scale-110"><SmartIcon icon={link.icon} size={36} imgClassName="w-9 h-9 rounded-lg" /></div>
+                        <span className="font-bold truncate text-[15px]">{link.title}</span>
+                      </GlassCard>
+                    ))}
+                  </div>
+                </section>
+              ))}
+            </div>
+          ))}
+        </main>
+      </div>
+
+      <SyncIndicator />
+      <LinkManagerModal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} categories={categories} setCategories={setCategories} background={background} prefs={{ cardOpacity, themeColor, themeMode, themeColorAuto }} onUpdateAppearance={() => {}} onUpdateTheme={() => {}} isDefaultCode={isDefaultCode} />
+    </div>
+  );
+};
+
+export default App;
