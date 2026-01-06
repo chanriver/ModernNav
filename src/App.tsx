@@ -466,141 +466,114 @@ ${
       </div>
 
       {/* Navigation - Dynamic Island */}
-      <nav className="flex justify-center items-center py-6 px-4 relative z-[100] isolation-isolate text-sm font-medium tracking-wide">
-        <div className={islandContainerClass} style={islandStyle}>
-          {glassLayerNoise}
-          {glassLayerRim}
-          {glassLayerSheen}
+      <nav className="flex flex-col justify-center items-center py-6 px-4 relative z-[100] isolation-isolate text-sm font-medium tracking-wide">
+  {/* 第一行：灵动岛主导航容器 */}
+  <div className={islandContainerClass} style={islandStyle}>
+    {glassLayerNoise}
+    {glassLayerRim}
+    {glassLayerSheen}
 
-          <div className="relative z-10 flex items-center gap-1 flex-wrap justify-center max-w-full px-1">
-            {/* SECTION 1: Categories */}
-            <div 
-              ref={navTrackRef}
-              className="relative flex items-center overflow-x-auto no-scrollbar scroll-smooth flex-1"
-              style={{ 
-                maxWidth: 'calc(100vw - 160px)', 
-                WebkitOverflowScrolling: 'touch' 
-              }}
-            >
-              <div
-                className={slidingPillClass}
-                style={{
-                  left: navPillStyle.left,
-                  width: navPillStyle.width,
-                  opacity: navPillStyle.opacity,
-                  height: "100%",
-                }}
-              />
-              {categories.map((cat) => {
-                const hasSingleDefault =
-                  cat.subCategories.length === 1 &&
-                  cat.subCategories[0].title === "Default";
-                const isActive = activeCategory === cat.id;
-                
-                return (
-                  <div key={cat.id} className="relative group flex-shrink-0">
-                    <button
-                      ref={(el) => {
-                        tabsRef.current[cat.id] = el;
-                      }}
-                      onClick={() => handleMainCategoryClick(cat)}
-                      className={`${categoryButtonBase} ${categoryButtonColors(isActive)} whitespace-nowrap`}
-                    >
-                      <span className="truncate max-w-[100px] sm:max-w-[120px] relative z-10">
-                        {cat.title}
-                      </span>
-                      {!hasSingleDefault && (
-                        <ChevronDown
-                          size={14}
-                          className={`relative z-10 transition-transform duration-300 group-hover:rotate-180 ${
-                            isActive ? "text-current" : "opacity-50"
-                          }`}
-                        />
-                      )}
-                    </button>
-                    
-                    {/* --- 二级菜单完整适配版 --- */}
-                    {!hasSingleDefault && (
-                      <div className={`
-                        /* 电脑端样式：绝对定位、悬浮出现 */
-                        md:absolute md:top-full md:left-1/2 md:-translate-x-1/2 md:pt-4 md:w-34 md:z-[100] md:origin-top
-                        /* 手机端样式：固定在导航栏正下方，不再受限于父级容器的 overflow */
-                        fixed left-0 right-0 top-[76px] px-4 py-2
-                        /* 交互逻辑：电脑端 hover 出现，手机端只有 isActive 时才 block */
-                        ${isActive ? "block" : "hidden md:group-hover:block"} 
-                        animate-fade-in
-                      `}>
-                        <div
-                          className={`${dropdownClasses} rounded-xl p-1 flex flex-row md:flex-col gap-1 overflow-x-auto no-scrollbar shadow-2xl ring-1 ring-white/5`}
-                        >
-                          {cat.subCategories.length > 0 ? (
-                            cat.subCategories.map((sub) => {
-                              const isSubActive = activeCategory === cat.id && activeSubCategoryId === sub.id;
-                              return (
-                                <button
-                                  key={sub.id}
-                                  onClick={(e) => {
-                                    e.stopPropagation();
-                                    handleSubCategoryClick(cat.id, sub.id);
-                                  }}
-                                  className={`
-                                    flex-shrink-0 px-3 py-1.5 rounded-md text-xs transition-all duration-200 flex items-center gap-2 whitespace-nowrap
-                                    ${isSubActive 
-                                      ? "bg-[var(--theme-primary)] text-white font-medium shadow-md scale-105" 
-                                      : isDark ? "text-white/70 hover:bg-white/10" : "text-slate-700 hover:bg-black/5"
-                                    }
-                                  `}
-                                >
-                                  <span>{sub.title}</span>
-                                  {isSubActive && <div className="w-1 h-1 rounded-full bg-white animate-pulse"></div>}
-                                </button>
-                              );
-                            })
-                          ) : (
-                            <div className={`px-3 py-2 text-[10px] text-center italic ${isDark ? "text-white/40" : "text-slate-400"}`}>
-                              {t("no_submenus")}
-                            </div>
-                          )}
-                        </div>
-                      </div>
-                    )}
-                  </div>
-                );
-              })}
+    <div className="relative z-10 flex items-center gap-1 flex-wrap justify-center max-w-full px-1">
+      {/* SECTION 1: Categories (主分类滑动区域) */}
+      <div 
+        ref={navTrackRef}
+        className="relative flex items-center overflow-x-auto no-scrollbar scroll-smooth flex-1"
+        style={{ 
+          maxWidth: 'calc(100vw - 160px)', 
+          WebkitOverflowScrolling: 'touch' 
+        }}
+      >
+        {/* 活动分类的背景滑块 */}
+        <div 
+          className={slidingPillClass} 
+          style={{ 
+            left: navPillStyle.left, 
+            width: navPillStyle.width, 
+            opacity: navPillStyle.opacity, 
+            height: "100%" 
+          }} 
+        />
+        
+        {categories.map((cat) => {
+          const isActive = activeCategory === cat.id;
+          // 检查是否只有默认子分类
+          const hasSingleDefault = cat.subCategories.length === 1 && cat.subCategories[0].title === "Default";
+
+          return (
+            <div key={cat.id} className="relative flex-shrink-0">
+              <button
+                ref={(el) => { tabsRef.current[cat.id] = el; }}
+                onClick={() => handleMainCategoryClick(cat)}
+                className={`${categoryButtonBase} ${categoryButtonColors(isActive)} whitespace-nowrap`}
+              >
+                <span className="truncate max-w-[100px] relative z-10">{cat.title}</span>
+                {!hasSingleDefault && (
+                  <ChevronDown 
+                    size={14} 
+                    className={`relative z-10 transition-transform duration-300 ${isActive ? "rotate-180" : "opacity-50"}`} 
+                  />
+                )}
+              </button>
             </div>
+          );
+        })}
+      </div>
 
-            {/* SECTION 2: Separator */}
-            <div
-              className={`w-[1px] h-5 mx-2 rounded-full ${
-                isDark ? "bg-white/10" : "bg-slate-400/20"
-              }`}
-            ></div>
+      {/* SECTION 2 & 3: 分隔线与全局操作按钮 */}
+      <div className={`w-[1px] h-5 mx-2 rounded-full ${isDark ? "bg-white/10" : "bg-slate-400/20"}`}></div>
+      
+      <div className="flex items-center gap-1">
+        <button onClick={toggleLanguage} className={actionButtonClass} title="Switch Language">
+          <Globe size={18} />
+        </button>
+        <button onClick={toggleTheme} className={actionButtonClass} title="Toggle Theme">
+          {isDark ? <Moon size={18} /> : <Sun size={18} />}
+        </button>
+        <button onClick={() => setIsModalOpen(true)} className={actionButtonClass} title="Settings">
+          <Settings size={18} />
+        </button>
+      </div>
+    </div>
+  </div>
 
-            {/* SECTION 3: Actions */}
-            <button
-              onClick={toggleLanguage}
-              className={actionButtonClass}
-              title="Switch Language"
-            >
-              <Globe size={18} />
-            </button>
-            <button
-              onClick={toggleTheme}
-              className={actionButtonClass}
-              title="Toggle Theme"
-            >
-              {isDark ? <Moon size={18} /> : <Sun size={18} />}
-            </button>
-            <button
-              onClick={() => setIsModalOpen(true)}
-              className={actionButtonClass}
-              title={t("settings")}
-            >
-              <Settings size={18} />
-            </button>
-          </div>
+  {/* --- 第二行：二级菜单 (当选中分类有多个子分类时显示) --- */}
+  {(() => {
+    const activeCat = categories.find(c => c.id === activeCategory);
+    // 只有当子分类数量大于 1，或者唯一的子分类不是 "Default" 时才显示
+    const shouldShowSub = activeCat && (
+      activeCat.subCategories.length > 1 || 
+      (activeCat.subCategories.length === 1 && activeCat.subCategories[0].title !== "Default")
+    );
+
+    if (!shouldShowSub) return null;
+
+    return (
+      <div className="w-full max-w-[95vw] mt-4 animate-fade-in md:absolute md:top-[calc(100%-8px)] md:w-auto">
+        <div className={`${dropdownClasses} rounded-2xl p-1.5 flex flex-row flex-wrap md:flex-nowrap justify-center items-center gap-1.5 shadow-2xl ring-1 ring-white/5 overflow-x-auto no-scrollbar`}>
+          {activeCat.subCategories.map((sub) => {
+            const isSubActive = activeSubCategoryId === sub.id;
+            return (
+              <button
+                key={sub.id}
+                onClick={() => handleSubCategoryClick(activeCategory, sub.id)}
+                className={`
+                  px-4 py-2 rounded-xl text-xs transition-all duration-300 whitespace-nowrap flex items-center gap-2
+                  ${isSubActive 
+                    ? "bg-[var(--theme-primary)] text-white shadow-lg scale-105 font-bold" 
+                    : isDark ? "text-white/60 hover:bg-white/10" : "text-slate-600 hover:bg-black/5"
+                  }
+                `}
+              >
+                <span>{sub.title}</span>
+                {isSubActive && <div className="w-1.5 h-1.5 rounded-full bg-white animate-pulse" />}
+              </button>
+            );
+          })}
         </div>
-      </nav>
+      </div>
+    );
+  })()}
+</nav>
 
       <div className="container mx-auto px-4 flex-1 flex flex-col items-center pt-8 md:pt-12 max-w-[900px] relative z-[10]">
         <section className="w-full mb-14 animate-fade-in-down relative z-[70] isolation-isolate">
