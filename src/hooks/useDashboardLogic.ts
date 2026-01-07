@@ -226,6 +226,14 @@ export const useDashboardLogic = () => {
       themeColor,
       themeMode: newTheme,
       themeColorAuto,
+      maxContainerWidth,
+      cardWidth,
+      cardHeight,
+      gridColumns,
+      siteTitle,
+      faviconApi,
+      footerGithub,
+      footerLinks,
     });
   };
 
