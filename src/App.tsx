@@ -708,47 +708,78 @@ ${
 
       <SyncIndicator />
 
-      <footer
-        className={`relative z-10 py-5 text-center text-[11px] flex flex-col md:flex-row justify-center items-center gap-4 border-t backdrop-blur-sm transition-colors duration-500 ${
-          isDark
-            ? "text-white/30 border-white/5 bg-black/10"
-            : "text-slate-500 border-black/5 bg-white/20"
-        }`}
+     <footer
+  className={`relative z-10 py-5 text-center text-[11px] flex flex-col md:flex-row justify-center items-center gap-4 border-t backdrop-blur-sm transition-colors duration-500 ${
+    isDark
+      ? "text-white/30 border-white/5 bg-black/10"
+      : "text-slate-500 border-black/5 bg-white/20"
+  }`}
+>
+  {/* --- 新增：左侧诗句 --- */}
+  <div 
+    className={`hidden lg:block absolute left-8 italic opacity-60 animate-pulse transition-opacity duration-1000 ${
+      isDark ? "text-white/80" : "text-slate-700"
+    }`}
+    style={{ 
+      fontFamily: '"FangSong", "STFangsong", "仿宋", serif', 
+      fontSize: '14px',
+      letterSpacing: '0.1em'
+    }}
+  >
+    宠辱不惊，看庭前花开花落
+  </div>
+
+  {/* --- 原有中间内容区 --- */}
+  <div className="flex flex-col md:flex-row items-center gap-4">
+    <div className="flex gap-4">
+      <a
+        href="https://nav.361026.xyz"
+        target="_blank"
+        rel="noopener noreferrer"
+        className="flex items-center gap-1.5 hover:text-[var(--theme-primary)] cursor-pointer transition-colors"
       >
-        <div className="flex gap-4">
-          <a
-            href="https://nav.361026.xyz"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="flex items-center gap-1.5 hover:text-[var(--theme-primary)] cursor-pointer transition-colors"
-          >
-            <LinkIcon size={12} /> {t("friendly_links")}
-          </a>
-          <a
-            href="https://github.com/chanriver"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="flex items-center gap-1.5 hover:text-[var(--theme-primary)] cursor-pointer transition-colors"
-          >
-            <Github size={12} /> {t("about_us")}
-          </a>
-        </div>
-        <div className="flex items-center">
-          <p>
-            {t("copyright")} © {new Date().getFullYear()} ModernNav
-            <span className="mx-2 opacity-50">|</span>
-            <span className="opacity-80">{t("powered_by")}</span>
-          </p>
-          <a
-            href="https://github.com/chanriver/ModernNav"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="ml-1 font-semibold hover:text-[var(--theme-primary)] transition-colors"
-          >
-            Chanriver
-          </a>
-        </div>
-      </footer>
+        <LinkIcon size={12} /> {t("friendly_links")}
+      </a>
+      <a
+        href="https://github.com/chanriver"
+        target="_blank"
+        rel="noopener noreferrer"
+        className="flex items-center gap-1.5 hover:text-[var(--theme-primary)] cursor-pointer transition-colors"
+      >
+        <Github size={12} /> {t("about_us")}
+      </a>
+    </div>
+    <div className="flex items-center">
+      <p>
+        {t("copyright")} © {new Date().getFullYear()} ModernNav
+        <span className="mx-2 opacity-50">|</span>
+        <span className="opacity-80">{t("powered_by")}</span>
+      </p>
+      <a
+        href="https://github.com/chanriver/ModernNav"
+        target="_blank"
+        rel="noopener noreferrer"
+        className="ml-1 font-semibold hover:text-[var(--theme-primary)] transition-colors"
+      >
+        Chanriver
+      </a>
+    </div>
+  </div>
+
+  {/* --- 新增：右侧诗句 --- */}
+  <div 
+    className={`hidden lg:block absolute right-8 italic opacity-60 animate-pulse transition-opacity duration-1000 ${
+      isDark ? "text-white/80" : "text-slate-700"
+    }`}
+    style={{ 
+      fontFamily: '"FangSong", "STFangsong", "仿宋", serif', 
+      fontSize: '14px',
+      letterSpacing: '0.1em'
+    }}
+  >
+    去留无意，望天上云卷云舒
+  </div>
+</footer>
 
       <LinkManagerModal
         isOpen={isModalOpen}
