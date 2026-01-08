@@ -708,35 +708,59 @@ ${
 
       <SyncIndicator />
 
-     <footer
-  className={`relative z-10 py-5 text-center text-[11px] flex flex-col md:flex-row justify-center items-center gap-4 border-t backdrop-blur-sm transition-colors duration-500 ${
+<footer
+  className={`relative z-10 py-8 text-center text-[11px] flex flex-col justify-center items-center gap-6 border-t backdrop-blur-sm transition-colors duration-500 ${
     isDark
       ? "text-white/30 border-white/5 bg-black/10"
       : "text-slate-500 border-black/5 bg-white/20"
   }`}
 >
-  {/* --- 新增：左侧诗句 --- */}
-  <div 
-    className={`hidden lg:block absolute left-8 italic opacity-60 animate-pulse transition-opacity duration-1000 ${
-      isDark ? "text-white/80" : "text-slate-700"
-    }`}
-    style={{ 
-      fontFamily: '"FangSong", "STFangsong", "仿宋", serif', 
-      fontSize: '14px',
-      letterSpacing: '0.1em'
-    }}
-  >
-    宠辱不惊，看庭前花开花落
+  {/* 诗句容器：使用 Flex 布局让两句向中间靠拢 */}
+  <div className="hidden lg:flex w-full max-w-[1000px] justify-between px-12 items-center absolute inset-0 pointer-events-none">
+    
+    {/* 左侧诗句 */}
+    <div 
+      className={`transition-all duration-1000 animate-[pulse_5s_infinite] ${
+        isDark 
+          ? "text-white/90 [text-shadow:0_2px_10px_rgba(0,0,0,0.8)]" 
+          : "text-slate-900 [text-shadow:0_2px_10px_rgba(255,255,255,0.8)]"
+      }`}
+      style={{ 
+        fontFamily: '"STKaiti", "Kaiti SC", "楷体", "KaiTi", serif', 
+        fontSize: '20px',      // 字号加大
+        fontWeight: '900',     // 极粗
+        letterSpacing: '0.2em' // 增加字间距增加高级感
+      }}
+    >
+      宠辱不惊，看庭前花开花落
+    </div>
+
+    {/* 右侧诗句 */}
+    <div 
+      className={`transition-all duration-1000 animate-[pulse_5s_infinite] ${
+        isDark 
+          ? "text-white/90 [text-shadow:0_2px_10px_rgba(0,0,0,0.8)]" 
+          : "text-slate-900 [text-shadow:0_2px_10px_rgba(255,255,255,0.8)]"
+      }`}
+      style={{ 
+        fontFamily: '"STKaiti", "Kaiti SC", "楷体", "KaiTi", serif', 
+        fontSize: '20px', 
+        fontWeight: '900', 
+        letterSpacing: '0.2em'
+      }}
+    >
+      去留无意，望天上云卷云舒
+    </div>
   </div>
 
-  {/* --- 原有中间内容区 --- */}
-  <div className="flex flex-col md:flex-row items-center gap-4">
+  {/* 原有版权内容：放在容器中确保不被诗句遮挡 */}
+  <div className="relative z-20 flex flex-col md:flex-row items-center gap-4">
     <div className="flex gap-4">
       <a
         href="https://nav.361026.xyz"
         target="_blank"
         rel="noopener noreferrer"
-        className="flex items-center gap-1.5 hover:text-[var(--theme-primary)] cursor-pointer transition-colors"
+        className="flex items-center gap-1.5 hover:text-[var(--theme-primary)] transition-colors"
       >
         <LinkIcon size={12} /> {t("friendly_links")}
       </a>
@@ -744,7 +768,7 @@ ${
         href="https://github.com/chanriver"
         target="_blank"
         rel="noopener noreferrer"
-        className="flex items-center gap-1.5 hover:text-[var(--theme-primary)] cursor-pointer transition-colors"
+        className="flex items-center gap-1.5 hover:text-[var(--theme-primary)] transition-colors"
       >
         <Github size={12} /> {t("about_us")}
       </a>
@@ -758,29 +782,13 @@ ${
       <a
         href="https://github.com/chanriver/ModernNav"
         target="_blank"
-        rel="noopener noreferrer"
-        className="ml-1 font-semibold hover:text-[var(--theme-primary)] transition-colors"
+        className="ml-1 font-semibold hover:text-[var(--theme-primary)]"
       >
         Chanriver
       </a>
     </div>
   </div>
-
-  {/* --- 新增：右侧诗句 --- */}
-  <div 
-    className={`hidden lg:block absolute right-8 italic opacity-60 animate-pulse transition-opacity duration-1000 ${
-      isDark ? "text-white/80" : "text-slate-700"
-    }`}
-    style={{ 
-      fontFamily: '"FangSong", "STFangsong", "仿宋", serif', 
-      fontSize: '14px',
-      letterSpacing: '0.1em'
-    }}
-  >
-    去留无意，望天上云卷云舒
-  </div>
 </footer>
-
       <LinkManagerModal
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
