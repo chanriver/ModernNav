@@ -640,17 +640,6 @@ ${
   <div className={`h-[2px] flex-1 bg-gradient-to-l from-transparent ${isDark ? "to-white/30" : "to-slate-400/40"}`}></div>
 </div>
 
-  {/* 情况一：没有选中二级分类 → 显示该主分类下的所有子分类 */}
-  {activeSubCategoryId === "" && visibleCategory?.subCategories.map((sub) => (
-    <div key={sub.id} className="mb-10">
-
-      {/* 子分类标题 */}
-      <div className="flex items-center gap-4 mb-5">
-        <h3 className="text-lg md:text-xl font-black">
-          {sub.title}
-        </h3>
-        <div className="flex-1 h-px bg-white/20"></div>
-      </div>
 
 
       {/* 修改后的网格布局：手机1列，平板2列，电脑4列 */}
@@ -714,6 +703,10 @@ ${
           <p className="text-sm">{t("no_links")}</p>
         </div>
       )}
+    </div>
+  ) : (
+    <div className={`text-center py-12 ${isDark ? "text-white/30" : "text-slate-400"}`}>
+      No sub-categories found.
     </div>
   )}
 </main>
