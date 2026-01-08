@@ -392,49 +392,14 @@ ${
       <ToastContainer />
 
       <style>{`
-  :root {
-    --theme-primary: ${themeColor};
-    --theme-hover: color-mix(in srgb, ${themeColor}, black 10%);
-    --theme-active: color-mix(in srgb, ${themeColor}, black 20%);
-    --theme-light: color-mix(in srgb, ${themeColor}, white 30%);
-    --glass-blur: ${adaptiveGlassBlur}px;
-  }
-
-  /* --- 新增：隐藏导航滚动条 --- */
-  .no-scrollbar::-webkit-scrollbar {
-    display: none;
-  }
-  .no-scrollbar {
-    -ms-overflow-style: none;
-    scrollbar-width: none;
-    overflow-x: auto;
-  }
-/* 给导航滑动区域增加边缘渐变感，提示还有内容 */
-.no-scrollbar {
-  mask-image: linear-gradient(to right, transparent, black 5%, black 95%, transparent);
-  -webkit-mask-image: linear-gradient(to right, transparent, black 5%, black 95%, transparent);
-}
-
- /* 适配手机端的导航与二级菜单优化 */
-  @media (max-width: 768px) {
-    .nav-island-container {
-      max-width: 98vw; /* 手机端占据更多宽度 */
-    }
-
-    /* 确保二级菜单展开时，下方的内容（搜索框等）有足够的间距，不被遮挡 */
-    nav {
-      margin-bottom: 45px; /* 为固定的二级菜单留出空间 */
-      transition: margin-bottom 0.3s ease;
-    }
-
-    /* 优化分类按钮在手机端的大小 */
-    .category-button-base {
-      padding-left: 0.8rem;
-      padding-right: 0.8rem;
-      font-size: 0.85rem;
-    }
-  }
-`}</style>
+        :root {
+          --theme-primary: ${themeColor};
+          --theme-hover: color-mix(in srgb, ${themeColor}, black 10%);
+          --theme-active: color-mix(in srgb, ${themeColor}, black 20%);
+          --theme-light: color-mix(in srgb, ${themeColor}, white 30%);
+          --glass-blur: ${adaptiveGlassBlur}px;
+        }
+      `}</style>
 
       {/* Background Layer */}
       <div className="fixed inset-0 z-0">
@@ -466,122 +431,126 @@ ${
       </div>
 
       {/* Navigation - Dynamic Island */}
-      <nav className="flex flex-col justify-center items-center py-6 px-4 relative z-[100] isolation-isolate text-sm font-medium tracking-wide">
-  {/* 第一行：灵动岛主导航容器 */}
-  <div className={islandContainerClass} style={islandStyle}>
-    {glassLayerNoise}
-    {glassLayerRim}
-    {glassLayerSheen}
+      <nav className="flex justify-center items-center py-6 px-4 relative z-[100] isolation-isolate text-sm font-medium tracking-wide">
+        <div className={islandContainerClass} style={islandStyle}>
+          {glassLayerNoise}
+          {glassLayerRim}
+          {glassLayerSheen}
 
-    <div className="relative z-10 flex items-center gap-1 flex-wrap justify-center max-w-full px-1">
-      {/* SECTION 1: Categories (主分类滑动区域) */}
-      <div 
-        ref={navTrackRef}
-        className="relative flex items-center overflow-x-auto no-scrollbar scroll-smooth flex-1"
-        style={{ 
-          maxWidth: 'calc(100vw - 160px)', 
-          WebkitOverflowScrolling: 'touch' 
-        }}
-      >
-        {/* 活动分类的背景滑块 */}
-        <div 
-          className={slidingPillClass} 
-          style={{ 
-            left: navPillStyle.left, 
-            width: navPillStyle.width, 
-            opacity: navPillStyle.opacity, 
-            height: "100%" 
-          }} 
-        />
-        
-        {categories.map((cat) => {
-          const isActive = activeCategory === cat.id;
-          // 检查是否只有默认子分类
-          const hasSingleDefault = cat.subCategories.length === 1 && cat.subCategories[0].title === "Default";
-
-          return (
-            <div key={cat.id} className="relative flex-shrink-0">
-              <button
-                ref={(el) => { tabsRef.current[cat.id] = el; }}
-                onClick={() => handleMainCategoryClick(cat)}
-                className={`${categoryButtonBase} ${categoryButtonColors(isActive)} whitespace-nowrap`}
-              >
-                <span className="truncate max-w-[100px] relative z-10">{cat.title}</span>
-                {!hasSingleDefault && (
-                  <ChevronDown 
-                    size={14} 
-                    className={`relative z-10 transition-transform duration-300 ${isActive ? "rotate-180" : "opacity-50"}`} 
-                  />
-                )}
-              </button>
+          <div className="relative z-10 flex items-center gap-1 flex-wrap justify-center max-w-full px-1">
+            {/* SECTION 1: Categories */}
+            <div className="relative flex items-center" ref={navTrackRef}>
+              <div
+                className={slidingPillClass}
+                style={{
+                  left: navPillStyle.left,
+                  width: navPillStyle.width,
+                  opacity: navPillStyle.opacity,
+                  height: "100%",
+                }}
+              />
+              {categories.map((cat) => {
+                const hasSingleDefault =
+                  cat.subCategories.length === 1 &&
+                  cat.subCategories[0].title === "Default";
+                const isActive = activeCategory === cat.id;
+                return (
+                  <div key={cat.id} className="relative group">
+                    <button
+                      ref={(el) => {
+                        tabsRef.current[cat.id] = el;
+                      }}
+                      onClick={() => handleMainCategoryClick(cat)}
+                      className={`${categoryButtonBase} ${categoryButtonColors(
+                        isActive
+                      )}`}
+                    >
+                      <span className="truncate max-w-[120px] relative z-10">
+                        {cat.title}
+                      </span>
+                      {!hasSingleDefault && (
+                        <ChevronDown
+                          size={14}
+                          className={`relative z-10 transition-transform duration-300 group-hover:rotate-180 ${
+                            isActive ? "text-current" : "opacity-50"
+                          }`}
+                        />
+                      )}
+                    </button>
+                    {!hasSingleDefault && (
+                      <div className="absolute top-full left-1/2 -translate-x-1/2 pt-4 hidden group-hover:block z-[100] w-34 animate-fade-in origin-top">
+                        <div
+                          className={`${dropdownClasses} rounded-xl p-1 flex flex-col gap-0.5 overflow-hidden ring-1 ring-white/5 shadow-2xl`}
+                        >
+                          {cat.subCategories.length > 0 ? (
+                            cat.subCategories.map((sub) => (
+                              <button
+                                key={sub.id}
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  handleSubCategoryClick(cat.id, sub.id);
+                                }}
+                                className={getDropdownItemClass(
+                                  activeCategory === cat.id &&
+                                    activeSubCategoryId === sub.id
+                                )}
+                              >
+                                <span className="truncate">{sub.title}</span>
+                                {activeCategory === cat.id &&
+                                  activeSubCategoryId === sub.id && (
+                                    <div className="w-1 h-1 rounded-full bg-white shadow-sm"></div>
+                                  )}
+                              </button>
+                            ))
+                          ) : (
+                            <div
+                              className={`px-3 py-2 text-[10px] text-center italic ${
+                                isDark ? "text-white/40" : "text-slate-400"
+                              }`}
+                            >
+                              {t("no_submenus")}
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                );
+              })}
             </div>
-          );
-        })}
-      </div>
 
-      {/* SECTION 2 & 3: 分隔线与全局操作按钮 */}
-      <div className={`w-[1px] h-5 mx-2 rounded-full ${isDark ? "bg-white/10" : "bg-slate-400/20"}`}></div>
-      
-      <div className="flex items-center gap-1">
-        <button onClick={toggleLanguage} className={actionButtonClass} title="Switch Language">
-          <Globe size={18} />
-        </button>
-        <button onClick={toggleTheme} className={actionButtonClass} title="Toggle Theme">
-          {isDark ? <Moon size={18} /> : <Sun size={18} />}
-        </button>
-        <button onClick={() => setIsModalOpen(true)} className={actionButtonClass} title="Settings">
-          <Settings size={18} />
-        </button>
-      </div>
-    </div>
-  </div>
+            {/* SECTION 2: Separator */}
+            <div
+              className={`w-[1px] h-5 mx-2 rounded-full ${
+                isDark ? "bg-white/10" : "bg-slate-400/20"
+              }`}
+            ></div>
 
-{/* --- 第二行：二级菜单 (当选中分类有多个子分类时显示) --- */}
-  {(() => {
-    const activeCat = categories.find(c => c.id === activeCategory);
-    const shouldShowSub = activeCat && (
-      activeCat.subCategories.length > 1 || 
-      (activeCat.subCategories.length === 1 && activeCat.subCategories[0].title !== "Default")
-    );
-
-    if (!shouldShowSub) return null;
-
-    return (
-      /* 去掉之前的 absolute 定位，使用相对定位和外边距确保它就在主导航正下方 */
-      <div className="w-full flex justify-center mt-2 animate-fade-in relative z-[90]">
-        <div 
-          className={`${dropdownClasses} rounded-2xl p-1 flex flex-row flex-wrap justify-center items-center gap-1.5 shadow-xl ring-1 ring-white/5 max-w-[95vw] overflow-hidden`}
-          style={{
-            backdropFilter: `blur(${adaptiveGlassBlur}px) saturate(180%)`,
-            WebkitBackdropFilter: `blur(${adaptiveGlassBlur}px) saturate(180%)`,
-            // 使用稍浅的背景色与主灵动岛区分
-            background: isDark ? 'rgba(255,255,255,0.05)' : 'rgba(255,255,255,0.4)'
-          }}
-        >
-          {activeCat.subCategories.map((sub) => {
-            const isSubActive = activeSubCategoryId === sub.id;
-            return (
-              <button
-                key={sub.id}
-                onClick={() => handleSubCategoryClick(activeCategory, sub.id)}
-                className={`
-                  px-4 py-1.5 rounded-xl text-xs transition-all duration-300 whitespace-nowrap flex items-center gap-2
-                  ${isSubActive 
-                    ? "bg-[var(--theme-primary)] text-white shadow-md font-bold scale-105" 
-                    : isDark ? "text-white/60 hover:bg-white/10" : "text-slate-600 hover:bg-black/5"
-                  }
-                `}
-              >
-                <span>{sub.title}</span>
-                {isSubActive && <div className="w-1 h-1 rounded-full bg-white animate-pulse" />}
-              </button>
-            );
-          })}
+            {/* SECTION 3: Actions */}
+            <button
+              onClick={toggleLanguage}
+              className={actionButtonClass}
+              title="Switch Language"
+            >
+              <Globe size={18} />
+            </button>
+            <button
+              onClick={toggleTheme}
+              className={actionButtonClass}
+              title="Toggle Theme"
+            >
+              {isDark ? <Moon size={18} /> : <Sun size={18} />}
+            </button>
+            <button
+              onClick={() => setIsModalOpen(true)}
+              className={actionButtonClass}
+              title={t("settings")}
+            >
+              <Settings size={18} />
+            </button>
+          </div>
         </div>
-      </div>
-    );
-  })()}
-</nav>
+      </nav>
 
       <div className="container mx-auto px-4 flex-1 flex flex-col items-center pt-8 md:pt-12 max-w-[900px] relative z-[10]">
         <section className="w-full mb-14 animate-fade-in-down relative z-[70] isolation-isolate">
@@ -613,155 +582,150 @@ ${
     style={{ backgroundColor: 'var(--theme-primary)' }}
   ></div> */}
 </div>
-        
+        <main className="w-full pb-20 relative z-[10] space-y-8">
+  {visibleSubCategory ? (
+    <div key={visibleSubCategory.id}>
+      {/* 分类标题分割线 */}
+      {/* 分类标题分割线区域 */}
+<div className="flex items-center gap-6 mb-8 mt-4">
+  {/* 左侧装饰线：加粗一点点 */}
+  <div className={`h-[2px] flex-1 bg-gradient-to-r from-transparent ${isDark ? "to-white/30" : "to-slate-400/40"}`}></div>
+  
+  {/* --- 强化后的标题样式 --- */}
+  <h3 className={`
+    text-lg md:text-xl font-black tracking-tight px-6 py-2 rounded-xl
+    transition-all duration-300
+    ${isDark 
+      ? "text-white bg-white/10 shadow-[0_0_20px_rgba(255,255,255,0.05)] border border-white/10" 
+      : "text-slate-900 bg-white/60 shadow-sm border border-black/5"
+    }
+  `} 
+  style={{ 
+    backdropFilter: 'blur(8px)',
+    WebkitBackdropFilter: 'blur(8px)',
+    // 强制使用系统黑体，增加可读性
+    fontFamily: 'system-ui, -apple-system, sans-serif'
+  }}>
+    {visibleSubCategory.title === "Default" ? visibleCategory?.title : visibleSubCategory.title}
+  </h3>
+  
+  {/* 右侧装饰线 */}
+  <div className={`h-[2px] flex-1 bg-gradient-to-l from-transparent ${isDark ? "to-white/30" : "to-slate-400/40"}`}></div>
+</div>
 
-<main className="w-full pb-20 relative z-[10] space-y-12">
-  {visibleCategory ? (
-    <div key={activeCategory} className="space-y-12">
-      {/* 逻辑：
-         1. 将 subCategories 数组重新排序，把选中的 subId 排在第一位
-         2. 依次渲染每个 subCategory 块
-      */}
-      {(() => {
-        const sortedSubCats = [...visibleCategory.subCategories].sort((a, b) => {
-          if (a.id === activeSubCategoryId) return -1;
-          if (b.id === activeSubCategoryId) return 1;
-          return 0;
-        });
-
-        return sortedSubCats.map((sub) => (
-          <div 
-            key={sub.id} 
-            id={`sub-section-${sub.id}`}
-            className={`transition-all duration-700 ${
-              sub.id === activeSubCategoryId ? "translate-y-0 opacity-100" : "opacity-90"
-            }`}
+      {/* 修改后的网格布局：手机1列，平板2列，电脑4列 */}
+      <div 
+        key={visibleSubCategory.id}
+        className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4"
+      >
+        {visibleSubCategory.items.map((link) => (
+          <GlassCard
+            key={link.id}
+            title={
+  link.description 
+    ? `站点：${link.title}\n链接：${link.url}\n简介：${link.description}` 
+    : `站点：${link.title}\n链接：${link.url}`
+}
+            hoverEffect={true}
+            opacity={cardOpacity}
+            themeMode={themeMode}
+            onClick={() => window.open(link.url, "_blank")}
+            // 修改为 h-20 且 padding 增加，内容水平排列
+            className="h-20 flex flex-row items-center px-5 gap-5 group animate-card-enter"
+            style={{ animationFillMode: 'backwards' }}
+            
           >
-            {/* 子分类标题分割线 (仅在非 Default 或 多个子分类时显示) */}
-            {(sub.title !== "Default" || visibleCategory.subCategories.length > 1) && (
-              <div className="flex items-center gap-6 mb-8 mt-4">
-                <div className={`h-[2px] w-8 bg-gradient-to-r from-transparent ${
-                  sub.id === activeSubCategoryId ? "to-[var(--theme-primary)] w-16" : (isDark ? "to-white/20" : "to-slate-400/30")
-                } transition-all duration-500`}></div>
-                
-                <h3 className={`text-lg font-black tracking-tight px-4 py-1.5 rounded-lg transition-all duration-300 ${
-                  sub.id === activeSubCategoryId 
-                    ? "text-[var(--theme-primary)] scale-110" 
-                    : (isDark ? "text-white/40" : "text-slate-400")
-                }`}>
-                  {sub.title}
-                </h3>
-                
-                <div className={`h-[2px] flex-1 bg-gradient-to-l from-transparent ${
-                  sub.id === activeSubCategoryId ? "to-[var(--theme-primary)]" : (isDark ? "to-white/20" : "to-slate-400/30")
-                } transition-all duration-500`}></div>
-              </div>
-            )}
-
-            {/* 该子分类下的网格布局 */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-              {sub.items.map((link) => (
-                <GlassCard
-                  key={link.id}
-                  title={link.description || link.title}
-                  hoverEffect={true}
-                  opacity={cardOpacity}
-                  themeMode={themeMode}
-                  onClick={() => window.open(link.url, "_blank")}
-                  className={`h-20 flex flex-row items-center px-5 gap-5 group animate-card-enter border-transparent transition-all duration-500 ${
-                    sub.id === activeSubCategoryId 
-                    ? "ring-1 ring-[var(--theme-primary)]/30 bg-[var(--theme-primary)]/5" 
-                    : ""
-                  }`}
-                >
-                  <div className={`flex-shrink-0 transition-transform duration-300 group-hover:scale-110 flex items-center justify-center h-9 w-9 ${isDark ? "text-white/90" : "text-slate-700"}`}>
-                    <SmartIcon icon={link.icon} size={36} imgClassName="w-9 h-9 object-contain drop-shadow-md rounded-lg" />
-                  </div>
-                  <div className="flex flex-col items-start overflow-hidden">
-                    <span className={`text-[16px] font-bold truncate w-full transition-colors duration-300 ${isDark ? "text-white group-hover:text-[var(--theme-primary)]" : "text-slate-800"}`}>
-                      {link.title}
-                    </span>
-                  </div>
-                </GlassCard>
-              ))}
+            {/* 图标容器：尺寸加大 50% (24px -> 36px) */}
+            <div
+              className={`flex-shrink-0 transition-transform duration-300 group-hover:scale-110 flex items-center justify-center h-9 w-9 ${
+                isDark ? "text-white/90" : "text-slate-700"
+              }`}
+            >
+              <SmartIcon 
+                icon={link.icon} 
+                size={36} 
+                imgClassName="w-9 h-9 object-contain drop-shadow-md rounded-lg"
+              />
             </div>
-          </div>
-        ));
-      })()}
+
+            {/* 文字容器：靠左对齐，字号加大 */}
+            <div className="flex flex-col items-start overflow-hidden">
+              <span
+                className={`text-[16px] font-bold truncate w-full transition-colors duration-300 ${
+                  isDark ? "text-white group-hover:text-[var(--theme-primary)]" : "text-slate-800"
+                }`}
+              >
+                {link.title}
+              </span>
+              {/* 可选：显示描述信息 */}
+             {/* {link.description && (
+                <span className={`text-[11px] truncate w-full opacity-50 ${isDark ? "text-white/60" : "text-slate-500"}`}>
+                  {link.description}
+                </span>
+              )} */}
+            </div>
+          </GlassCard>
+        ))}
+      </div>
+
+      {visibleSubCategory.items.length === 0 && (
+        <div className={`text-center py-16 flex flex-col items-center gap-3 ${isDark ? "text-white/20" : "text-slate-400"}`}>
+          <FolderOpen size={40} strokeWidth={1} />
+          <p className="text-sm">{t("no_links")}</p>
+        </div>
+      )}
     </div>
   ) : (
     <div className={`text-center py-12 ${isDark ? "text-white/30" : "text-slate-400"}`}>
-      No categories found.
+      No sub-categories found.
     </div>
   )}
-</main>	</div>
+</main>
+	</div>
 
       <SyncIndicator />
 
-<footer
-  className={`relative z-10 py-5 text-center flex justify-center items-center border-t backdrop-blur-sm transition-all duration-500 ${
-    isDark
-      ? "border-white/10 bg-black/20 text-white"
-      : "border-black/10 bg-white/40 text-slate-900"
-  }`}
->
-  {/* --- 绝对定位：左侧诗句 --- */}
-  <div 
-    className={`hidden lg:block absolute transition-all duration-1000 animate-[pulse_7s_infinite] pointer-events-none ${
-      isDark ? "[text-shadow:0_0_20px_rgba(0,0,0,1)]" : "[text-shadow:0_0_20px_rgba(255,255,255,1)]"
-    }`}
-    style={{ 
-      fontFamily: '"STKaiti", "Kaiti SC", "楷体", "KaiTi", serif', 
-      fontSize: '32px', 
-      fontWeight: '900',
-      right: 'calc(50% + 400px)', 
-      whiteSpace: 'nowrap'
-    }}
-  >
-    宠辱不惊，看庭前花开花落
-  </div>
-
-  {/* --- 中间内容：单行、高亮、高反差 --- */}
-  <div className="relative z-20 flex flex-row items-center gap-4 whitespace-nowrap font-bold" style={{ fontSize: '13px' }}>
-    {/* 友情链接与关于我们 */}
-    <div className="flex items-center gap-4">
-      <a href="https://nav.361026.xyz" target="_blank" className="hover:text-[var(--theme-primary)] transition-colors flex items-center gap-1.5">
-        <LinkIcon size={14} /> {t("friendly_links")}
-      </a>
-      <a href="https://github.com/chanriver" target="_blank" className="hover:text-[var(--theme-primary)] transition-colors flex items-center gap-1.5">
-        <Github size={14} /> {t("about_us")}
-      </a>
-    </div>
-
-    {/* 分隔线 */}
-    <span className={`w-[1px] h-3 ${isDark ? "bg-white/40" : "bg-black/20"}`}></span>
-
-    {/* 版权信息：单行呈现 */}
-    <div className="flex items-center gap-1.5">
-      <span>{t("copyright")} © {new Date().getFullYear()} <span className="text-[var(--theme-primary)]">ModernNav</span></span>
-      <span className="opacity-40">|</span>
-      <span>{t("powered_by")}</span>
-      <a href="https://github.com/chanriver/ModernNav" target="_blank" className="hover:underline hover:text-[var(--theme-primary)]">Chanriver</a>
-    </div>
-  </div>
-
-  {/* --- 绝对定位：右侧诗句 --- */}
-  <div 
-    className={`hidden lg:block absolute transition-all duration-1000 animate-[pulse_7s_infinite] pointer-events-none ${
-      isDark ? "[text-shadow:0_0_20px_rgba(0,0,0,1)]" : "[text-shadow:0_0_20px_rgba(255,255,255,1)]"
-    }`}
-    style={{ 
-      fontFamily: '"STKaiti", "Kaiti SC", "楷体", "KaiTi", serif', 
-      fontSize: '32px', 
-      fontWeight: '900',
-      left: 'calc(50% + 400px)', 
-      whiteSpace: 'nowrap',
-      animationDelay: '3.5s'
-    }}
-  >
-    去留无意，望天上云卷云舒
-  </div>
-</footer>
+      <footer
+        className={`relative z-10 py-5 text-center text-[11px] flex flex-col md:flex-row justify-center items-center gap-4 border-t backdrop-blur-sm transition-colors duration-500 ${
+          isDark
+            ? "text-white/30 border-white/5 bg-black/10"
+            : "text-slate-500 border-black/5 bg-white/20"
+        }`}
+      >
+        <div className="flex gap-4">
+          <a
+            href="https://math.nyc.mn"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="flex items-center gap-1.5 hover:text-[var(--theme-primary)] cursor-pointer transition-colors"
+          >
+            <LinkIcon size={12} /> {t("friendly_links")}
+          </a>
+          <a
+            href="https://github.com/chanriver"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="flex items-center gap-1.5 hover:text-[var(--theme-primary)] cursor-pointer transition-colors"
+          >
+            <Github size={12} /> {t("about_us")}
+          </a>
+        </div>
+        <div className="flex items-center">
+          <p>
+            {t("copyright")} © {new Date().getFullYear()} ModernNav
+            <span className="mx-2 opacity-50">|</span>
+            <span className="opacity-80">{t("powered_by")}</span>
+          </p>
+          <a
+            href="https://github.com/chanriver/ModernNav"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="ml-1 font-semibold hover:text-[var(--theme-primary)] transition-colors"
+          >
+            Chanriver
+          </a>
+        </div>
+      </footer>
 
       <LinkManagerModal
         isOpen={isModalOpen}
