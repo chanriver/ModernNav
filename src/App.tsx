@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef, useMemo } from "react";
-// --- 1. 图标与基础组件导入 ---
+// --- 1. 基础依赖导入 ---
 import {
   Settings,
   Link as LinkIcon,
@@ -11,7 +11,6 @@ import {
   Loader2,
   Github,
 } from "lucide-react";
-import * as Icons from "lucide-react";
 import { SmartIcon } from "./components/SmartIcon";
 import { ConsoleLog } from "./components/ConsoleLog";
 import { SearchBar } from "./components/SearchBar";
@@ -19,15 +18,13 @@ import { GlassCard } from "./components/GlassCard";
 import { LinkManagerModal } from "./components/LinkManagerModal";
 import { ToastContainer } from "./components/Toast";
 import { SyncIndicator } from "./components/SyncIndicator";
-
-// --- 2. 业务逻辑与上下文 ---
 import { storageService, DEFAULT_BACKGROUND } from "./services/storage";
 import { getDominantColor } from "./utils/color";
 import { Category, ThemeMode } from "./types";
 import { useLanguage } from "./contexts/LanguageContext";
 
 const App: React.FC = () => {
-  // --- 3. 核心状态 ---
+  // --- 2. 状态定义 ---
   const [loading, setLoading] = useState(true);
   const [categories, setCategories] = useState<Category[]>([]);
   const [background, setBackground] = useState<string>(DEFAULT_BACKGROUND);
@@ -37,23 +34,24 @@ const App: React.FC = () => {
   const [themeMode, setThemeMode] = useState<ThemeMode>(ThemeMode.Dark);
   const [isDefaultCode, setIsDefaultCode] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
+
   const [activeCategory, setActiveCategory] = useState<string>("");
   const [activeSubCategoryId, setActiveSubCategoryId] = useState<string>("");
 
   const { t, language, setLanguage } = useLanguage();
   const isDark = themeMode === ThemeMode.Dark;
 
-  // 灵动岛滑块引用
+  // 导航动画引用
   const tabsRef = useRef<{ [key: string]: HTMLButtonElement | null }>({});
   const navTrackRef = useRef<HTMLDivElement>(null);
   const [navPillStyle, setNavPillStyle] = useState({ left: 0, width: 0, opacity: 0 });
 
-  // --- 4. 核心逻辑：计算显示的卡片（置顶逻辑） ---
+  // --- 3. 核心功能逻辑：内容置顶算法 ---
   const { visibleCategory, displayLinks } = useMemo(() => {
     const currentCat = categories.find((c) => c.id === activeCategory);
     if (!currentCat) return { visibleCategory: null, displayLinks: [] };
 
-    // 如果没有选中二级分类，显示全部
+    // 如果没选二级分类 -> 显示主分类下所有子分类的所有链接
     if (!activeSubCategoryId) {
       return { 
         visibleCategory: currentCat, 
@@ -61,18 +59,20 @@ const App: React.FC = () => {
       };
     }
 
-    // 如果选中了，则该二级分类内容置顶，其余内容排在后面
+    // 如果选了二级分类 -> 该分类 items 置顶，其他 items 跟在后面
     const activeSub = currentCat.subCategories.find(s => s.id === activeSubCategoryId);
     const otherSubs = currentCat.subCategories.filter(s => s.id !== activeSubCategoryId);
-    const sortedLinks = [
-      ...(activeSub ? activeSub.items : []),
-      ...otherSubs.flatMap(sub => sub.items)
-    ];
-
-    return { visibleCategory: currentCat, displayLinks: sortedLinks };
+    
+    return {
+      visibleCategory: currentCat,
+      displayLinks: [
+        ...(activeSub ? activeSub.items : []),
+        ...otherSubs.flatMap(sub => sub.items)
+      ]
+    };
   }, [activeCategory, activeSubCategoryId, categories]);
 
-  // --- 5. 生命周期与初始化 ---
+  // --- 4. 数据初始化与主题色提取 ---
   useEffect(() => {
     const initData = async () => {
       setLoading(true);
@@ -100,7 +100,7 @@ const App: React.FC = () => {
     document.documentElement.style.setProperty("--theme-primary", themeColor);
   }, [themeColor]);
 
-  // 导航滑块位置同步
+  // 灵动岛滑块跟随
   useEffect(() => {
     const updatePill = () => {
       const activeTab = tabsRef.current[activeCategory];
@@ -115,17 +115,22 @@ const App: React.FC = () => {
     return () => { window.removeEventListener("resize", updatePill); clearTimeout(timer); };
   }, [activeCategory, categories, loading]);
 
-  // --- 6. 交互函数 ---
+  // --- 5. 交互操作 ---
   const handleMainCategoryClick = (cat: Category) => {
     setActiveCategory(cat.id);
-    setActiveSubCategoryId(""); // 点击主分类，默认置顶取消，显示全部
+    setActiveSubCategoryId(""); // 重置为显示全部
   };
 
   const handleSubCategoryClick = (subId: string) => {
     setActiveSubCategoryId(activeSubCategoryId === subId ? "" : subId);
   };
 
-  if (loading) return <div className="min-h-screen bg-slate-900 flex items-center justify-center flex-col gap-4"><Loader2 className="animate-spin text-white/40" size={40} /></div>;
+  const toggleTheme = () => {
+    const newTheme = isDark ? ThemeMode.Light : ThemeMode.Dark;
+    setThemeMode(newTheme);
+  };
+
+  if (loading) return <div className="min-h-screen bg-slate-900 flex items-center justify-center"><Loader2 className="animate-spin text-white/40" size={40} /></div>;
 
   return (
     <div className={`min-h-screen relative overflow-x-hidden flex flex-col ${isDark ? "text-slate-100" : "text-slate-800"}`}>
@@ -141,19 +146,19 @@ const App: React.FC = () => {
         <div className={`absolute inset-0 ${isDark ? "bg-slate-900/30" : "bg-white/10"}`} />
       </div>
 
-      {/* --- 7. 灵动岛 (改版：二级菜单包含在主菜单容器内) --- */}
+      {/* --- 6. 灵动岛导航（逻辑修改版） --- */}
       <nav className="flex flex-col justify-center items-center py-6 px-4 relative z-[100] text-sm">
-        <div className={`relative flex flex-col items-center p-2 rounded-[30px] border transition-all duration-500 shadow-2xl ${
+        <div className={`relative flex flex-col items-center p-1.5 rounded-[32px] border transition-all duration-500 shadow-2xl ${
           isDark ? "border-white/10 bg-black/20" : "border-white/40 bg-white/60"
         }`} style={{ backdropFilter: 'blur(40px)' }}>
           
-          {/* 主导航行 */}
+          {/* 第一层：主分类 */}
           <div className="relative z-10 flex items-center gap-1 px-1">
             <div ref={navTrackRef} className="relative flex items-center overflow-x-auto no-scrollbar scroll-smooth flex-1" style={{ maxWidth: 'calc(100vw - 160px)' }}>
               <div className="absolute top-0 bottom-0 rounded-full transition-all duration-300 bg-white/20" style={{ ...navPillStyle, height: "100%" }} />
               {categories.map((cat) => (
                 <button key={cat.id} ref={(el) => { tabsRef.current[cat.id] = el; }} onClick={() => handleMainCategoryClick(cat)}
-                  className={`relative z-10 px-5 py-2 rounded-full transition-colors whitespace-nowrap font-bold ${activeCategory === cat.id ? "text-white" : "text-white/40 hover:text-white/70"}`}>
+                  className={`relative z-10 px-4 py-2 rounded-full transition-colors whitespace-nowrap font-bold ${activeCategory === cat.id ? "text-white" : "text-white/40 hover:text-white/70"}`}>
                   {cat.title}
                 </button>
               ))}
@@ -161,13 +166,14 @@ const App: React.FC = () => {
             <div className="w-[1px] h-5 mx-2 bg-white/10" />
             <div className="flex items-center gap-1">
               <button onClick={() => setLanguage(language === 'en' ? 'zh' : 'en')} className="p-2 text-white/60 hover:text-white"><Globe size={18} /></button>
+              <button onClick={toggleTheme} className="p-2 text-white/60 hover:text-white">{isDark ? <Moon size={18} /> : <Sun size={18} />}</button>
               <button onClick={() => setIsModalOpen(true)} className="p-2 text-white/60 hover:text-white"><Settings size={18} /></button>
             </div>
           </div>
 
-          {/* 二级分类行 (紧跟其下) */}
+          {/* 第二层：二级分类（置顶切换器） */}
           {visibleCategory && visibleCategory.subCategories.length > 1 && (
-            <div className="flex flex-wrap justify-center gap-2 mt-2 px-4 pb-1">
+            <div className="flex flex-wrap justify-center gap-2 mt-1.5 px-4 pb-1">
               {visibleCategory.subCategories.map((sub) => (
                 <button key={sub.id} onClick={() => handleSubCategoryClick(sub.id)}
                   className={`px-3 py-1 rounded-lg text-[11px] font-bold transition-all border ${
@@ -181,61 +187,64 @@ const App: React.FC = () => {
         </div>
       </nav>
 
+      {/* --- 7. 主体内容（搜索+名言+卡片） --- */}
       <div className="container mx-auto px-4 flex-1 flex flex-col items-center pt-8 max-w-[900px] relative z-[10]">
-        {/* --- 8. 强化版搜索框 --- */}
+        
+        {/* 搜索框 */}
         <section className="w-full mb-14 relative z-[70]">
           <SearchBar themeMode={themeMode} />
         </section>
 
-        {/* --- 9. 抠图级名人名言 --- */}
+        {/* 高反差名人名言 */}
         <div className="w-full flex flex-col items-center mt-[-60px] mb-8 relative z-[60]">
           <div className={`px-6 text-center select-none font-black ${
             isDark 
               ? "text-white [text-shadow:1px_1px_0_#000,-1px_-1px_0_#000,1px_-1px_0_#000,-1px_1px_0_#000,0_2px_10px_rgba(0,0,0,1)]" 
               : "text-black [text-shadow:1px_1px_0_#fff,-1px_-1px_0_#fff,1px_-1px_0_#fff,-1px_1px_0_#fff,0_2px_8px_rgba(255,255,255,1)]"
-          }`} style={{ fontSize: '1.2rem', filter: isDark ? 'brightness(1.2)' : 'contrast(1.2)' }}>
+          }`} style={{ fontSize: '1.2rem' }}>
             <ConsoleLog />
           </div> 
         </div>
 
-        {/* --- 10. 卡片内容区 --- */}
-        <main className="w-full pb-20 space-y-8">
-          {visibleCategory && (
-            <div>
-              <div className="flex items-center gap-6 mb-8 mt-4">
-                <div className={`h-[2px] flex-1 bg-gradient-to-r from-transparent ${isDark ? "to-white/30" : "to-slate-400/40"}`}></div>
-                <h3 className={`text-lg font-black px-6 py-2 rounded-xl border ${isDark ? "text-white bg-white/10 border-white/10" : "text-slate-900 bg-white/60 border-black/5"}`}>
-                  {activeSubCategoryId ? visibleCategory.subCategories.find(s=>s.id===activeSubCategoryId)?.title : visibleCategory.title}
-                </h3>
-                <div className={`h-[2px] flex-1 bg-gradient-to-l from-transparent ${isDark ? "to-white/30" : "to-slate-400/40"}`}></div>
-              </div>
-              
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 animate-card-enter">
-                {displayLinks.map((link, idx) => (
-                  <GlassCard key={`${link.id}-${idx}`} opacity={cardOpacity} themeMode={themeMode} onClick={() => window.open(link.url, "_blank")}
-                    className={`h-20 flex flex-row items-center px-5 gap-5 group border-2 ${
-                      activeSubCategoryId && idx < (visibleCategory.subCategories.find(s=>s.id===activeSubCategoryId)?.items.length || 0)
-                      ? "border-[var(--theme-primary)]/40 shadow-lg" : "border-transparent"
-                    }`}>
-                    <div className="flex-shrink-0 group-hover:scale-110 transition-transform"><SmartIcon icon={link.icon} size={36} /></div>
-                    <span className={`text-[16px] font-bold truncate ${isDark ? "text-white" : "text-slate-800"}`}>{link.title}</span>
-                  </GlassCard>
-                ))}
-              </div>
-            </div>
-          )}
+        {/* 链接卡片网格：恢复原始样式，实现置顶逻辑 */}
+        <main className="w-full pb-20">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 animate-card-enter">
+            {displayLinks.map((link, idx) => (
+              <GlassCard 
+                key={`${link.id}-${idx}`} 
+                opacity={cardOpacity} 
+                themeMode={themeMode} 
+                onClick={() => window.open(link.url, "_blank")}
+                // --- 恢复卡片原始样式：h-20, flex-row ---
+                className="h-20 flex flex-row items-center px-5 gap-5 group"
+              >
+                <div className="flex-shrink-0 group-hover:scale-110 transition-transform h-9 w-9">
+                  <SmartIcon icon={link.icon} size={36} />
+                </div>
+                <div className="flex flex-col items-start overflow-hidden">
+                  <span className={`text-[16px] font-bold truncate w-full transition-colors ${
+                    isDark ? "text-white group-hover:text-[var(--theme-primary)]" : "text-slate-800"
+                  }`}>
+                    {link.title}
+                  </span>
+                </div>
+              </GlassCard>
+            ))}
+          </div>
         </main>
       </div>
 
-      {/* --- 11. 最终修正版页脚 (高反差、单行、不遮挡) --- */}
+      {/* --- 8. 单行高反差页脚 --- */}
       <footer className={`relative z-10 py-5 text-center flex justify-center items-center border-t backdrop-blur-sm transition-all duration-500 ${
         isDark ? "border-white/10 bg-black/20 text-white" : "border-black/10 bg-white/40 text-slate-900"
       }`}>
+        {/* 左诗句 */}
         <div className={`hidden lg:block absolute transition-all duration-1000 animate-[pulse_7s_infinite] pointer-events-none ${isDark ? "[text-shadow:0_0_20px_rgba(0,0,0,1)]" : "[text-shadow:0_0_20px_rgba(255,255,255,1)]"}`}
           style={{ fontFamily: '"STKaiti", "楷体", serif', fontSize: '32px', fontWeight: '900', right: 'calc(50% + 400px)', whiteSpace: 'nowrap' }}>
           宠辱不惊，看庭前花开花落
         </div>
 
+        {/* 单行版权信息 */}
         <div className="relative z-20 flex flex-row items-center gap-4 whitespace-nowrap font-bold text-[13px]">
           <div className="flex items-center gap-4">
             <a href="https://nav.361026.xyz" target="_blank" className="hover:text-[var(--theme-primary)] flex items-center gap-1.5"><LinkIcon size={14} /> {t("friendly_links")}</a>
@@ -249,6 +258,7 @@ const App: React.FC = () => {
           </div>
         </div>
 
+        {/* 右诗句 */}
         <div className={`hidden lg:block absolute transition-all duration-1000 animate-[pulse_7s_infinite] pointer-events-none ${isDark ? "[text-shadow:0_0_20px_rgba(0,0,0,1)]" : "[text-shadow:0_0_20px_rgba(255,255,255,1)]"}`}
           style={{ fontFamily: '"STKaiti", "楷体", serif', fontSize: '32px', fontWeight: '900', left: 'calc(50% + 400px)', whiteSpace: 'nowrap', animationDelay: '3.5s' }}>
           去留无意，望天上云卷云舒
