@@ -715,26 +715,27 @@ ${
       : "text-slate-500 border-black/5 bg-white/20"
   }`}
 >
-  {/* --- 绝对定位：左侧诗句 (向中靠拢) --- */}
+  {/* --- 绝对定位：左侧诗句 (距离拉开，防止遮挡) --- */}
   <div 
-    className={`hidden lg:block absolute transition-all duration-1000 animate-[pulse_6s_infinite] pointer-events-none ${
+    className={`hidden lg:block absolute transition-all duration-1000 animate-[pulse_7s_infinite] pointer-events-none ${
       isDark 
-        ? "text-white [text-shadow:0_0_20px_rgba(0,0,0,1)]" 
-        : "text-slate-900 [text-shadow:0_0_20px_rgba(255,255,255,1)]"
+        ? "text-white [text-shadow:0_0_25px_rgba(0,0,0,1)]" 
+        : "text-slate-900 [text-shadow:0_0_25px_rgba(255,255,255,1)]"
     }`}
     style={{ 
       fontFamily: '"STKaiti", "Kaiti SC", "楷体", "KaiTi", serif', 
       fontSize: '32px', 
       fontWeight: '900',
-      right: 'calc(50% + 180px)', // 核心：距离中心线向左偏移 180px
-      whiteSpace: 'nowrap'
+      right: 'calc(50% + 320px)', // 增加间距到 320px
+      whiteSpace: 'nowrap',
+      opacity: 0.8
     }}
   >
     宠辱不惊，看庭前花开花落
   </div>
 
-  {/* --- 原有中间内容区域 (位置完全不动) --- */}
-  <div className="flex flex-col md:flex-row items-center gap-4 z-10">
+  {/* --- 中间内容区域：增加最小宽度保护层 --- */}
+  <div className="flex flex-col md:flex-row items-center gap-4 z-10 min-w-[350px]">
     <div className="flex gap-4">
       <a
         href="https://nav.361026.xyz"
@@ -770,19 +771,21 @@ ${
     </div>
   </div>
 
-  {/* --- 绝对定位：右侧诗句 (向中靠拢) --- */}
+  {/* --- 绝对定位：右侧诗句 (距离拉开，防止遮挡) --- */}
   <div 
-    className={`hidden lg:block absolute transition-all duration-1000 animate-[pulse_6s_infinite] pointer-events-none ${
+    className={`hidden lg:block absolute transition-all duration-1000 animate-[pulse_7s_infinite] pointer-events-none ${
       isDark 
-        ? "text-white [text-shadow:0_0_20px_rgba(0,0,0,1)]" 
-        : "text-slate-900 [text-shadow:0_0_20px_rgba(255,255,255,1)]"
+        ? "text-white [text-shadow:0_0_25px_rgba(0,0,0,1)]" 
+        : "text-slate-900 [text-shadow:0_0_25px_rgba(255,255,255,1)]"
     }`}
     style={{ 
       fontFamily: '"STKaiti", "Kaiti SC", "楷体", "KaiTi", serif', 
       fontSize: '32px', 
       fontWeight: '900',
-      left: 'calc(50% + 180px)', // 核心：距离中心线向右偏移 180px
-      whiteSpace: 'nowrap'
+      left: 'calc(50% + 320px)', // 增加间距到 320px
+      whiteSpace: 'nowrap',
+      opacity: 0.8,
+      animationDelay: '3.5s' // 让左右两句交替呼吸，不那么突兀
     }}
   >
     去留无意，望天上云卷云舒
