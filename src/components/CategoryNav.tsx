@@ -145,126 +145,84 @@ export const CategoryNav: React.FC<CategoryNavProps> = ({
     />
   );
 
-  return (
-    <nav className="flex justify-center items-center py-6 px-4 relative z-[100] isolation-isolate text-sm font-medium tracking-wide">
-      <div className={islandContainerClass} style={islandStyle}>
-        {glassLayerNoise}
-        {glassLayerRim}
-        {glassLayerSheen}
+  // ... 前面逻辑保持不变 ...
+return (
+  <nav className="flex flex-col items-center py-6 px-4 relative z-[100] gap-4">
+    {/* 第一行：主导航灵动岛 */}
+    <div className={islandContainerClass} style={islandStyle}>
+      {glassLayerNoise}
+      {glassLayerRim}
+      {glassLayerSheen}
 
-        <div className="relative z-10 flex items-center gap-1 flex-wrap justify-center max-w-full px-1">
-          {/* SECTION 1: Categories */}
-          <div className="relative flex items-center" ref={navTrackRef}>
-            <div
-              className={slidingPillClass}
-              style={{
-                left: navPillStyle.left,
-                width: navPillStyle.width,
-                opacity: navPillStyle.opacity,
-                height: "100%",
-              }}
-            />
-            {categories.map((cat) => {
-              const hasSingleDefault =
-                cat.subCategories.length === 1 &&
-                cat.subCategories[0].title === "Default";
-              const isActive = activeCategory === cat.id;
+      <div className="relative z-10 flex items-center gap-1 flex-wrap justify-center max-w-full px-1">
+        <div className="relative flex items-center" ref={navTrackRef}>
+          {/* 滑动背景块 */}
+          <div
+            className={slidingPillClass}
+            style={{
+              left: navPillStyle.left,
+              width: navPillStyle.width,
+              opacity: navPillStyle.opacity,
+              height: "100%",
+            }}
+          />
+          {categories.map((cat) => (
+            <button
+              key={cat.id}
+              ref={(el) => { tabsRef.current[cat.id] = el; }}
+              onClick={() => onCategoryClick(cat)}
+              className={`${categoryButtonBase} ${categoryButtonColors(activeCategory === cat.id)}`}
+            >
+              <span className="truncate max-w-[120px] relative z-10">{cat.title}</span>
+            </button>
+          ))}
+        </div>
+
+        <div className={`w-[1px] h-5 mx-2 rounded-full ${isDark ? "bg-white/10" : "bg-slate-400/20"}`}></div>
+
+        <div className="flex items-center gap-1">
+          <button onClick={toggleLanguage} className={actionButtonClass}><Globe size={18} /></button>
+          <button onClick={toggleTheme} className={actionButtonClass}>{isDark ? <Moon size={18} /> : <Sun size={18} />}</button>
+          <button onClick={openSettings} className={actionButtonClass}><Settings size={18} /></button>
+        </div>
+      </div>
+    </div>
+
+    {/* 第二行：平铺的二级子菜单 (点击主分类后常驻) */}
+    {(() => {
+      const activeCat = categories.find(c => c.id === activeCategory);
+      // 如果子分类多于1个，或者唯一的子分类不是 "Default"，则显示二级导航
+      const hasSubCats = activeCat && (
+        activeCat.subCategories.length > 1 || 
+        (activeCat.subCategories.length === 1 && activeCat.subCategories[0].title !== "Default")
+      );
+      
+      if (!hasSubCats) return null;
+
+      return (
+        <div className="flex justify-center w-full animate-fade-in">
+          <div className={`${dropdownClasses} rounded-2xl p-1.5 flex flex-row flex-wrap justify-center items-center gap-2 shadow-lg border border-white/10`}>
+            {activeCat.subCategories.map((sub) => {
+              const isSubActive = activeSubCategoryId === sub.id;
               return (
-                <div key={cat.id} className="relative group">
-                  <button
-                    ref={(el) => {
-                      tabsRef.current[cat.id] = el;
-                    }}
-                    onClick={() => onCategoryClick(cat)}
-                    className={`${categoryButtonBase} ${categoryButtonColors(
-                      isActive
-                    )}`}
-                  >
-                    <span className="truncate max-w-[180px] relative z-10 text-xl font-bold">
-                      {cat.title}
-                    </span>
-                    {!hasSingleDefault && (
-                      <ChevronDown
-                        size={14}
-                        className={`relative z-10 transition-transform duration-300 group-hover:rotate-180 ${
-                          isActive ? "text-current" : "opacity-50"
-                        }`}
-                      />
-                    )}
-                  </button>
-                  {!hasSingleDefault && (
-                    <div className="absolute top-full left-1/2 -translate-x-1/2 pt-4 hidden group-hover:block z-[100] w-34 animate-fade-in origin-top">
-                      <div
-                        className={`${dropdownClasses} rounded-xl p-1 flex flex-col gap-0.5 overflow-hidden ring-1 ring-white/5 shadow-2xl`}
-                      >
-                        {cat.subCategories.length > 0 ? (
-                          cat.subCategories.map((sub) => (
-                            <button
-                              key={sub.id}
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                onSubCategoryClick(cat.id, sub.id);
-                              }}
-                              className={getDropdownItemClass(
-                                activeCategory === cat.id &&
-                                  activeSubCategoryId === sub.id
-                              )}
-                            >
-                              <span className="truncate text-lg">{sub.title}</span>
-                              {activeCategory === cat.id &&
-                                activeSubCategoryId === sub.id && (
-                                  <div className="w-1 h-1 rounded-full bg-white shadow-sm"></div>
-                                )}
-                            </button>
-                          ))
-                        ) : (
-                          <div
-                            className={`px-3 py-2 text-[10px] text-center italic ${
-                              isDark ? "text-white/40" : "text-slate-400"
-                            }`}
-                          >
-                            {t("no_submenus")}
-                          </div>
-                        )}
-                      </div>
-                    </div>
-                  )}
-                </div>
+                <button
+                  key={sub.id}
+                  onClick={() => onSubCategoryClick(activeCategory, sub.id)}
+                  className={`px-4 py-1.5 rounded-xl text-xs transition-all duration-300 flex items-center gap-2
+                    ${isSubActive 
+                      ? "bg-[var(--theme-primary)] text-white shadow-md font-bold scale-105" 
+                      : isDark ? "text-white/60 hover:bg-white/10" : "text-slate-600 hover:bg-black/5"
+                    }`}
+                >
+                  {sub.title}
+                  {isSubActive && <div className="w-1 h-1 rounded-full bg-white animate-pulse" />}
+                </button>
               );
             })}
           </div>
-
-          {/* SECTION 2: Separator */}
-          <div
-            className={`w-[1px] h-5 mx-2 rounded-full ${
-              isDark ? "bg-white/10" : "bg-slate-400/20"
-            }`}
-          ></div>
-
-          {/* SECTION 3: Actions */}
-          <button
-            onClick={toggleLanguage}
-            className={actionButtonClass}
-            title="Switch Language"
-          >
-            <Globe size={18} />
-          </button>
-          <button
-            onClick={toggleTheme}
-            className={actionButtonClass}
-            title="Toggle Theme"
-          >
-            {isDark ? <Moon size={18} /> : <Sun size={18} />}
-          </button>
-          <button
-            onClick={openSettings}
-            className={actionButtonClass}
-            title={t("settings")}
-          >
-            <Settings size={18} />
-          </button>
         </div>
-      </div>
-    </nav>
-  );
+      );
+    })()}
+  </nav>
+);
 };
