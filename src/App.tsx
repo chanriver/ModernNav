@@ -606,101 +606,70 @@ ${
   ></div> */}
 </div>
         <main className="w-full pb-20 relative z-[10] space-y-8">
-  {visibleSubCategory ? (
-    <div key={visibleSubCategory.id}>
-      {/* 分类标题分割线 */}
-      {/* 分类标题分割线区域 */}
-<div className="flex items-center gap-6 mb-8 mt-4">
-  {/* 左侧装饰线：加粗一点点 */}
-  <div className={`h-[2px] flex-1 bg-gradient-to-r from-transparent ${isDark ? "to-white/30" : "to-slate-400/40"}`}></div>
-  
-  {/* --- 强化后的标题样式 --- */}
-  <h3 className={`
-    text-lg md:text-xl font-black tracking-tight px-6 py-2 rounded-xl
-    transition-all duration-300
-    ${isDark 
-      ? "text-white bg-white/10 shadow-[0_0_20px_rgba(255,255,255,0.05)] border border-white/10" 
-      : "text-slate-900 bg-white/60 shadow-sm border border-black/5"
-    }
-  `} 
-  style={{ 
-    backdropFilter: 'blur(8px)',
-    WebkitBackdropFilter: 'blur(8px)',
-    // 强制使用系统黑体，增加可读性
-    fontFamily: 'system-ui, -apple-system, sans-serif'
-  }}>
-    {visibleSubCategory.title === "Default" ? visibleCategory?.title : visibleSubCategory.title}
-  </h3>
-  
-  {/* 右侧装饰线 */}
-  <div className={`h-[2px] flex-1 bg-gradient-to-l from-transparent ${isDark ? "to-white/30" : "to-slate-400/40"}`}></div>
-</div>
+  {visibleCategory ? (
+    <div key={activeCategory}>
+      {/* 动态计算并排序所有链接 */}
+      {(() => {
+        // 1. 扁平化当前主分类下所有二级分类的链接，并打上来源标记
+        const allLinks = visibleCategory.subCategories.flatMap(sub => 
+          sub.items.map(item => ({ ...item, parentSubId: sub.id }))
+        );
 
-      {/* 修改后的网格布局：手机1列，平板2列，电脑4列 */}
-      <div 
-        key={visibleSubCategory.id}
-        className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4"
-      >
-        {visibleSubCategory.items.map((link) => (
-          <GlassCard
-            key={link.id}
-            title={
-  link.description 
-    ? `站点：${link.title}\n链接：${link.url}\n简介：${link.description}` 
-    : `站点：${link.title}\n链接：${link.url}`
-}
-            hoverEffect={true}
-            opacity={cardOpacity}
-            themeMode={themeMode}
-            onClick={() => window.open(link.url, "_blank")}
-            // 修改为 h-20 且 padding 增加，内容水平排列
-            className="h-20 flex flex-row items-center px-5 gap-5 group animate-card-enter"
-            style={{ animationFillMode: 'backwards' }}
-            
-          >
-            {/* 图标容器：尺寸加大 50% (24px -> 36px) */}
-            <div
-              className={`flex-shrink-0 transition-transform duration-300 group-hover:scale-110 flex items-center justify-center h-9 w-9 ${
-                isDark ? "text-white/90" : "text-slate-700"
-              }`}
-            >
-              <SmartIcon 
-                icon={link.icon} 
-                size={36} 
-                imgClassName="w-9 h-9 object-contain drop-shadow-md rounded-lg"
-              />
+        // 2. 根据 activeSubCategoryId 进行排序：选中的排在最前面
+        const sortedLinks = [...allLinks].sort((a, b) => {
+          if (a.parentSubId === activeSubCategoryId) return -1;
+          if (b.parentSubId === activeSubCategoryId) return 1;
+          return 0;
+        });
+
+        if (allLinks.length === 0) {
+          return (
+            <div className={`text-center py-16 flex flex-col items-center gap-3 ${isDark ? "text-white/20" : "text-slate-400"}`}>
+              <FolderOpen size={40} strokeWidth={1} />
+              <p className="text-sm">{t("no_links")}</p>
             </div>
+          );
+        }
 
-            {/* 文字容器：靠左对齐，字号加大 */}
-            <div className="flex flex-col items-start overflow-hidden">
-              <span
-                className={`text-[16px] font-bold truncate w-full transition-colors duration-300 ${
-                  isDark ? "text-white group-hover:text-[var(--theme-primary)]" : "text-slate-800"
-                }`}
-              >
-                {link.title}
-              </span>
-              {/* 可选：显示描述信息 */}
-             {/* {link.description && (
-                <span className={`text-[11px] truncate w-full opacity-50 ${isDark ? "text-white/60" : "text-slate-500"}`}>
-                  {link.description}
-                </span>
-              )} */}
-            </div>
-          </GlassCard>
-        ))}
-      </div>
+        return (
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+            {sortedLinks.map((link) => {
+              const isHighlighted = link.parentSubId === activeSubCategoryId;
+              return (
+                <GlassCard
+                  key={link.id}
+                  title={link.description ? `站点：${link.title}\n链接：${link.url}\n简介：${link.description}` : `站点：${link.title}\n链接：${link.url}`}
+                  hoverEffect={true}
+                  opacity={cardOpacity}
+                  themeMode={themeMode}
+                  onClick={() => window.open(link.url, "_blank")}
+                  // 增加高亮样式：如果是选中的二级分类，增加边框发光感
+                  className={`h-20 flex flex-row items-center px-5 gap-5 group animate-card-enter transition-all duration-500 ${
+                    isHighlighted 
+                    ? "ring-2 ring-[var(--theme-primary)] shadow-[0_0_15px_rgba(var(--theme-primary-rgb),0.3)]" 
+                    : "opacity-80 hover:opacity-100"
+                  }`}
+                  style={{ animationFillMode: 'backwards' }}
+                >
+                  <div className={`flex-shrink-0 transition-transform duration-300 group-hover:scale-110 flex items-center justify-center h-9 w-9 ${isDark ? "text-white/90" : "text-slate-700"}`}>
+                    <SmartIcon icon={link.icon} size={36} imgClassName="w-9 h-9 object-contain drop-shadow-md rounded-lg" />
+                  </div>
 
-      {visibleSubCategory.items.length === 0 && (
-        <div className={`text-center py-16 flex flex-col items-center gap-3 ${isDark ? "text-white/20" : "text-slate-400"}`}>
-          <FolderOpen size={40} strokeWidth={1} />
-          <p className="text-sm">{t("no_links")}</p>
-        </div>
-      )}
+                  <div className="flex flex-col items-start overflow-hidden">
+                    <span className={`text-[16px] font-bold truncate w-full transition-colors duration-300 ${isDark ? "text-white group-hover:text-[var(--theme-primary)]" : "text-slate-800"}`}>
+                      {link.title}
+                    </span>
+                  </div>
+                </GlassCard>
+              );
+            })}
+          </div>
+        );
+      })()}
     </div>
   ) : (
     <div className={`text-center py-12 ${isDark ? "text-white/30" : "text-slate-400"}`}>
-      No sub-categories found.
+      No categories found.
     </div>
   )}
 </main>
