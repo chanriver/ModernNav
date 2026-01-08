@@ -536,10 +536,9 @@ ${
     </div>
   </div>
 
-  {/* --- 第二行：二级菜单 (当选中分类有多个子分类时显示) --- */}
+{/* --- 第二行：二级菜单 (当选中分类有多个子分类时显示) --- */}
   {(() => {
     const activeCat = categories.find(c => c.id === activeCategory);
-    // 只有当子分类数量大于 1，或者唯一的子分类不是 "Default" 时才显示
     const shouldShowSub = activeCat && (
       activeCat.subCategories.length > 1 || 
       (activeCat.subCategories.length === 1 && activeCat.subCategories[0].title !== "Default")
@@ -548,8 +547,17 @@ ${
     if (!shouldShowSub) return null;
 
     return (
-      <div className="w-full max-w-[95vw] mt-4 animate-fade-in md:absolute md:top-[calc(100%-8px)] md:w-auto">
-        <div className={`${dropdownClasses} rounded-2xl p-1.5 flex flex-row flex-wrap md:flex-nowrap justify-center items-center gap-1.5 shadow-2xl ring-1 ring-white/5 overflow-x-auto no-scrollbar`}>
+      /* 去掉之前的 absolute 定位，使用相对定位和外边距确保它就在主导航正下方 */
+      <div className="w-full flex justify-center mt-2 animate-fade-in relative z-[90]">
+        <div 
+          className={`${dropdownClasses} rounded-2xl p-1 flex flex-row flex-wrap justify-center items-center gap-1.5 shadow-xl ring-1 ring-white/5 max-w-[95vw] overflow-hidden`}
+          style={{
+            backdropFilter: `blur(${adaptiveGlassBlur}px) saturate(180%)`,
+            WebkitBackdropFilter: `blur(${adaptiveGlassBlur}px) saturate(180%)`,
+            // 使用稍浅的背景色与主灵动岛区分
+            background: isDark ? 'rgba(255,255,255,0.05)' : 'rgba(255,255,255,0.4)'
+          }}
+        >
           {activeCat.subCategories.map((sub) => {
             const isSubActive = activeSubCategoryId === sub.id;
             return (
@@ -557,15 +565,15 @@ ${
                 key={sub.id}
                 onClick={() => handleSubCategoryClick(activeCategory, sub.id)}
                 className={`
-                  px-4 py-2 rounded-xl text-xs transition-all duration-300 whitespace-nowrap flex items-center gap-2
+                  px-4 py-1.5 rounded-xl text-xs transition-all duration-300 whitespace-nowrap flex items-center gap-2
                   ${isSubActive 
-                    ? "bg-[var(--theme-primary)] text-white shadow-lg scale-105 font-bold" 
+                    ? "bg-[var(--theme-primary)] text-white shadow-md font-bold scale-105" 
                     : isDark ? "text-white/60 hover:bg-white/10" : "text-slate-600 hover:bg-black/5"
                   }
                 `}
               >
                 <span>{sub.title}</span>
-                {isSubActive && <div className="w-1.5 h-1.5 rounded-full bg-white animate-pulse" />}
+                {isSubActive && <div className="w-1 h-1 rounded-full bg-white animate-pulse" />}
               </button>
             );
           })}
