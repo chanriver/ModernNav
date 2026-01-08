@@ -1,4 +1,3 @@
-import { CategoryNav } from "./components/CategoryNav";
 import React, { useState, useEffect, useRef } from "react";
 import {
   Settings,
@@ -616,63 +615,86 @@ ${
 </div>
         
 
-{/* 主内容区域：核心逻辑修改 */}
-      <main className="w-full pb-20 relative z-[10] space-y-12">
-        {visibleCategory ? (
-          <div key={activeCategory} className="space-y-12 flex flex-col">
-            {/* 排序逻辑：把点击选中的 subCategoryId 排在数组第一位 */}
-            {[...visibleCategory.subCategories]
-              .sort((a, b) => {
-                if (a.id === activeSubCategoryId) return -1;
-                if (b.id === activeSubCategoryId) return 1;
-                return 0;
-              })
-              .map((sub) => (
-                <div 
-                  key={sub.id} 
-                  className={`transition-all duration-700 animate-fade-in ${
-                    sub.id === activeSubCategoryId ? "order-first" : ""
+<main className="w-full pb-20 relative z-[10] space-y-12">
+  {visibleCategory ? (
+    <div key={activeCategory} className="space-y-12">
+      {/* 逻辑：
+         1. 将 subCategories 数组重新排序，把选中的 subId 排在第一位
+         2. 依次渲染每个 subCategory 块
+      */}
+      {(() => {
+        const sortedSubCats = [...visibleCategory.subCategories].sort((a, b) => {
+          if (a.id === activeSubCategoryId) return -1;
+          if (b.id === activeSubCategoryId) return 1;
+          return 0;
+        });
+
+        return sortedSubCats.map((sub) => (
+          <div 
+            key={sub.id} 
+            id={`sub-section-${sub.id}`}
+            className={`transition-all duration-700 ${
+              sub.id === activeSubCategoryId ? "translate-y-0 opacity-100" : "opacity-90"
+            }`}
+          >
+            {/* 子分类标题分割线 (仅在非 Default 或 多个子分类时显示) */}
+            {(sub.title !== "Default" || visibleCategory.subCategories.length > 1) && (
+              <div className="flex items-center gap-6 mb-8 mt-4">
+                <div className={`h-[2px] w-8 bg-gradient-to-r from-transparent ${
+                  sub.id === activeSubCategoryId ? "to-[var(--theme-primary)] w-16" : (isDark ? "to-white/20" : "to-slate-400/30")
+                } transition-all duration-500`}></div>
+                
+                <h3 className={`text-lg font-black tracking-tight px-4 py-1.5 rounded-lg transition-all duration-300 ${
+                  sub.id === activeSubCategoryId 
+                    ? "text-[var(--theme-primary)] scale-110" 
+                    : (isDark ? "text-white/40" : "text-slate-400")
+                }`}>
+                  {sub.title}
+                </h3>
+                
+                <div className={`h-[2px] flex-1 bg-gradient-to-l from-transparent ${
+                  sub.id === activeSubCategoryId ? "to-[var(--theme-primary)]" : (isDark ? "to-white/20" : "to-slate-400/30")
+                } transition-all duration-500`}></div>
+              </div>
+            )}
+
+            {/* 该子分类下的网格布局 */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+              {sub.items.map((link) => (
+                <GlassCard
+                  key={link.id}
+                  title={link.description || link.title}
+                  hoverEffect={true}
+                  opacity={cardOpacity}
+                  themeMode={themeMode}
+                  onClick={() => window.open(link.url, "_blank")}
+                  className={`h-20 flex flex-row items-center px-5 gap-5 group animate-card-enter border-transparent transition-all duration-500 ${
+                    sub.id === activeSubCategoryId 
+                    ? "ring-1 ring-[var(--theme-primary)]/30 bg-[var(--theme-primary)]/5" 
+                    : ""
                   }`}
                 >
-                  {/* 子分类标题线 */}
-                  {(sub.title !== "Default" || visibleCategory.subCategories.length > 1) && (
-                    <div className="flex items-center gap-6 mb-8 mt-4">
-                      <div className={`h-[2px] transition-all duration-500 ${
-                        sub.id === activeSubCategoryId 
-                          ? "w-16 bg-[var(--theme-primary)]" 
-                          : "w-8 bg-slate-400/30"
-                      }`}></div>
-                      <h3 className={`text-lg font-black transition-all ${
-                        sub.id === activeSubCategoryId ? "text-[var(--theme-primary)] scale-110" : "text-slate-400"
-                      }`}>
-                        {sub.title === "Default" ? visibleCategory.title : sub.title}
-                      </h3>
-                      <div className="h-[2px] flex-1 bg-slate-400/10"></div>
-                    </div>
-                  )}
-
-                  {/* 卡片网格 */}
-                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-                    {sub.items.map((link) => (
-                      <GlassCard
-                        key={link.id}
-                        // ... 之前的 GlassCard 属性保持不变 ...
-                        className={`h-20 flex flex-row items-center px-5 gap-5 group animate-card-enter ${
-                          sub.id === activeSubCategoryId ? "ring-1 ring-[var(--theme-primary)]/40" : ""
-                        }`}
-                      >
-                         {/* ... 卡片内部图标和文字内容保持不变 ... */}
-                      </GlassCard>
-                    ))}
+                  <div className={`flex-shrink-0 transition-transform duration-300 group-hover:scale-110 flex items-center justify-center h-9 w-9 ${isDark ? "text-white/90" : "text-slate-700"}`}>
+                    <SmartIcon icon={link.icon} size={36} imgClassName="w-9 h-9 object-contain drop-shadow-md rounded-lg" />
                   </div>
-                </div>
+                  <div className="flex flex-col items-start overflow-hidden">
+                    <span className={`text-[16px] font-bold truncate w-full transition-colors duration-300 ${isDark ? "text-white group-hover:text-[var(--theme-primary)]" : "text-slate-800"}`}>
+                      {link.title}
+                    </span>
+                  </div>
+                </GlassCard>
               ))}
+            </div>
           </div>
-        ) : (
-          <div className="text-center py-12 opacity-30">No Data</div>
-        )}
-      </main>
-</div>
+        ));
+      })()}
+    </div>
+  ) : (
+    <div className={`text-center py-12 ${isDark ? "text-white/30" : "text-slate-400"}`}>
+      No categories found.
+    </div>
+  )}
+</main>	</div>
 
       <SyncIndicator />
 
