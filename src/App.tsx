@@ -685,47 +685,70 @@ ${
 
       <SyncIndicator />
 
-      <footer
-        className={`relative z-10 py-5 text-center text-[11px] flex flex-col md:flex-row justify-center items-center gap-4 border-t backdrop-blur-sm transition-colors duration-500 ${
-          isDark
-            ? "text-white/30 border-white/5 bg-black/10"
-            : "text-slate-500 border-black/5 bg-white/20"
-        }`}
-      >
-        <div className="flex gap-4">
-          <a
-            href="https://math.nyc.mn"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="flex items-center gap-1.5 hover:text-[var(--theme-primary)] cursor-pointer transition-colors"
-          >
-            <LinkIcon size={12} /> {t("friendly_links")}
-          </a>
-          <a
-            href="https://github.com/chanriver"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="flex items-center gap-1.5 hover:text-[var(--theme-primary)] cursor-pointer transition-colors"
-          >
-            <Github size={12} /> {t("about_us")}
-          </a>
-        </div>
-        <div className="flex items-center">
-          <p>
-            {t("copyright")} © {new Date().getFullYear()} ModernNav
-            <span className="mx-2 opacity-50">|</span>
-            <span className="opacity-80">{t("powered_by")}</span>
-          </p>
-          <a
-            href="https://github.com/chanriver/ModernNav"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="ml-1 font-semibold hover:text-[var(--theme-primary)] transition-colors"
-          >
-            Chanriver
-          </a>
-        </div>
-      </footer>
+<footer
+  className={`relative z-10 py-5 text-center flex justify-center items-center border-t backdrop-blur-sm transition-all duration-500 ${
+    isDark
+      ? "border-white/10 bg-black/20 text-white"
+      : "border-black/10 bg-white/40 text-slate-900"
+  }`}
+>
+  {/* --- 绝对定位：左侧诗句 --- */}
+  <div 
+    className={`hidden lg:block absolute transition-all duration-1000 animate-[pulse_7s_infinite] pointer-events-none ${
+      isDark ? "[text-shadow:0_0_20px_rgba(0,0,0,1)]" : "[text-shadow:0_0_20px_rgba(255,255,255,1)]"
+    }`}
+    style={{ 
+      fontFamily: '"STKaiti", "Kaiti SC", "楷体", "KaiTi", serif', 
+      fontSize: '32px', 
+      fontWeight: '900',
+      right: 'calc(50% + 400px)', 
+      whiteSpace: 'nowrap'
+    }}
+  >
+    宠辱不惊，看庭前花开花落
+  </div>
+
+  {/* --- 中间内容：单行、高亮、高反差 --- */}
+  <div className="relative z-20 flex flex-row items-center gap-4 whitespace-nowrap font-bold" style={{ fontSize: '13px' }}>
+    {/* 友情链接与关于我们 */}
+    <div className="flex items-center gap-4">
+      <a href="https://nav.361026.xyz" target="_blank" className="hover:text-[var(--theme-primary)] transition-colors flex items-center gap-1.5">
+        <LinkIcon size={14} /> {t("friendly_links")}
+      </a>
+      <a href="https://github.com/chanriver" target="_blank" className="hover:text-[var(--theme-primary)] transition-colors flex items-center gap-1.5">
+        <Github size={14} /> {t("about_us")}
+      </a>
+    </div>
+
+    {/* 分隔线 */}
+    <span className={`w-[1px] h-3 ${isDark ? "bg-white/40" : "bg-black/20"}`}></span>
+
+    {/* 版权信息：单行呈现 */}
+    <div className="flex items-center gap-1.5">
+      <span>{t("copyright")} © {new Date().getFullYear()} <span className="text-[var(--theme-primary)]">ModernNav</span></span>
+      <span className="opacity-40">|</span>
+      <span>{t("powered_by")}</span>
+      <a href="https://github.com/chanriver/ModernNav" target="_blank" className="hover:underline hover:text-[var(--theme-primary)]">Chanriver</a>
+    </div>
+  </div>
+
+  {/* --- 绝对定位：右侧诗句 --- */}
+  <div 
+    className={`hidden lg:block absolute transition-all duration-1000 animate-[pulse_7s_infinite] pointer-events-none ${
+      isDark ? "[text-shadow:0_0_20px_rgba(0,0,0,1)]" : "[text-shadow:0_0_20px_rgba(255,255,255,1)]"
+    }`}
+    style={{ 
+      fontFamily: '"STKaiti", "Kaiti SC", "楷体", "KaiTi", serif', 
+      fontSize: '32px', 
+      fontWeight: '900',
+      left: 'calc(50% + 400px)', 
+      whiteSpace: 'nowrap',
+      animationDelay: '3.5s'
+    }}
+  >
+    去留无意，望天上云卷云舒
+  </div>
+</footer>
 
       <LinkManagerModal
         isOpen={isModalOpen}
