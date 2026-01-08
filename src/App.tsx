@@ -494,29 +494,73 @@ ${
           }} 
         />
         
-        {categories.map((cat) => {
-          const isActive = activeCategory === cat.id;
-          // 检查是否只有默认子分类
-          const hasSingleDefault = cat.subCategories.length === 1 && cat.subCategories[0].title === "Default";
+       {categories.map((cat) => {
+  const isActive = activeCategory === cat.id;
+  const hasSub =
+    cat.subCategories.length > 1 ||
+    (cat.subCategories.length === 1 && cat.subCategories[0].title !== "Default");
 
-          return (
-            <div key={cat.id} className="relative flex-shrink-0">
+  return (
+    <div key={cat.id} className="relative flex-shrink-0">
+      {/* 主分类按钮 */}
+      <button
+        ref={(el) => {
+          tabsRef.current[cat.id] = el;
+        }}
+        onClick={() => handleMainCategoryClick(cat)}
+        className={`${categoryButtonBase} ${categoryButtonColors(isActive)} whitespace-nowrap`}
+      >
+        <span className="truncate max-w-[100px]">{cat.title}</span>
+        {hasSub && (
+          <ChevronDown
+            size={14}
+            className={`transition-transform duration-300 ${
+              isActive ? "rotate-180" : "opacity-50"
+            }`}
+          />
+        )}
+      </button>
+
+      {/* ✅ 二级分类：直接挂在主分类下面 */}
+      {isActive && hasSub && (
+        <div
+          className={`
+            absolute left-1/2 -translate-x-1/2 mt-2
+            min-w-[180px]
+            rounded-xl p-2
+            shadow-xl z-[200]
+            ${dropdownClasses}
+          `}
+        >
+          {cat.subCategories.map((sub) => {
+            const isSubActive = activeSubCategoryId === sub.id;
+            return (
               <button
-                ref={(el) => { tabsRef.current[cat.id] = el; }}
-                onClick={() => handleMainCategoryClick(cat)}
-                className={`${categoryButtonBase} ${categoryButtonColors(isActive)} whitespace-nowrap`}
+                key={sub.id}
+                onClick={() => handleSubCategoryClick(cat.id, sub.id)}
+                className={`
+                  w-full text-left px-4 py-2 rounded-lg
+                  text-sm md:text-base font-semibold
+                  transition-all
+                  ${
+                    isSubActive
+                      ? "bg-[var(--theme-primary)] text-white"
+                      : isDark
+                      ? "text-white/80 hover:bg-white/10"
+                      : "text-slate-700 hover:bg-black/5"
+                  }
+                `}
               >
-                <span className="truncate max-w-[100px] relative z-10">{cat.title}</span>
-                {!hasSingleDefault && (
-                  <ChevronDown 
-                    size={14} 
-                    className={`relative z-10 transition-transform duration-300 ${isActive ? "rotate-180" : "opacity-50"}`} 
-                  />
-                )}
+                {sub.title}
               </button>
-            </div>
-          );
-        })}
+            );
+          })}
+        </div>
+      )}
+    </div>
+  );
+})}
+
       </div>
 
       {/* SECTION 2 & 3: 分隔线与全局操作按钮 */}
@@ -536,47 +580,7 @@ ${
     </div>
   </div>
 
-  {/* --- 第二行：二级菜单 (当选中分类有多个子分类时显示) --- */}
-  {(() => {
-    const activeCat = categories.find(c => c.id === activeCategory);
-    // 只有当子分类数量大于 1，或者唯一的子分类不是 "Default" 时才显示
-    const shouldShowSub = activeCat && (
-      activeCat.subCategories.length > 1 || 
-      (activeCat.subCategories.length === 1 && activeCat.subCategories[0].title !== "Default")
-    );
-
-    if (!shouldShowSub) return null;
-
-    return (
-      <div className="w-full max-w-[95vw] mt-4 animate-fade-in">
-        <div className={`${dropdownClasses} rounded-2xl p-1.5 flex flex-row flex-wrap md:flex-nowrap justify-center items-center gap-1.5 shadow-2xl ring-1 ring-white/5 overflow-x-auto no-scrollbar`}>
-          {activeCat.subCategories.map((sub) => {
-            const isSubActive = activeSubCategoryId === sub.id;
-            return (
-              <button
-                key={sub.id}
-                onClick={() => handleSubCategoryClick(activeCategory, sub.id)}
-               className={`
-  		  px-5 py-2.5 rounded-xl
-  		  text-sm md:text-base font-semibold
-  		  transition-all duration-300 whitespace-nowrap
-  		${isSubActive 
-    		? "bg-[var(--theme-primary)] text-white shadow-lg scale-105" 
-   		 : isDark
-     		 ? "text-white/80 hover:bg-white/10"
-    		  : "text-slate-700 hover:bg-black/5"
-  		}
-		`}
-              >
-                <span>{sub.title}</span>
-                {isSubActive && <div className="w-1.5 h-1.5 rounded-full bg-white animate-pulse" />}
-              </button>
-            );
-          })}
-        </div>
-      </div>
-    );
-  })()}
+  
 </nav>
 
       <div className="container mx-auto px-4 flex-1 flex flex-col items-center pt-8 md:pt-12 max-w-[900px] relative z-[10]">
