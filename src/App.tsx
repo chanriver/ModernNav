@@ -1,3 +1,4 @@
+// App.tsx
 import React, { useState, useEffect, useRef } from "react";
 import {
   Settings,
@@ -8,9 +9,7 @@ import {
   Sun,
   Moon,
   Loader2,
-  Github,
 } from "lucide-react";
-import * as Icons from "lucide-react";
 import { SmartIcon } from "./components/SmartIcon";
 import { ConsoleLog } from "./components/ConsoleLog";
 import { SearchBar } from "./components/SearchBar";
@@ -19,12 +18,10 @@ import { LinkManagerModal } from "./components/LinkManagerModal";
 import { ToastContainer } from "./components/Toast";
 import { SyncIndicator } from "./components/SyncIndicator";
 import { storageService, DEFAULT_BACKGROUND } from "./services/storage";
-import { getDominantColor } from "./utils/color";
 import { Category, ThemeMode } from "./types";
 import { useLanguage } from "./contexts/LanguageContext";
 
 const App: React.FC = () => {
-  // ------------------ State ------------------
   const [loading, setLoading] = useState(true);
   const [categories, setCategories] = useState<Category[]>([]);
   const [background, setBackground] = useState<string>(DEFAULT_BACKGROUND);
@@ -38,11 +35,6 @@ const App: React.FC = () => {
   const [activeSubCategoryId, setActiveSubCategoryId] = useState<string>("");
   const { t, language, setLanguage } = useLanguage();
 
-  // ------------------ Navigation Animation ------------------
-  const [navPillStyle, setNavPillStyle] = useState({ left: 0, width: 0, opacity: 0 });
-  const tabsRef = useRef<{ [key: string]: HTMLButtonElement | null }>({});
-  const navTrackRef = useRef<HTMLDivElement>(null);
-
   const isDark = themeMode === ThemeMode.Dark;
   const isBackgroundUrl = background.startsWith("http") || background.startsWith("data:");
 
@@ -55,14 +47,9 @@ const App: React.FC = () => {
     return `${r}, ${g}, ${b}`;
   };
 
-  // ------------------ Effects ------------------
   useEffect(() => {
     document.documentElement.style.setProperty("--theme-primary", themeColor);
     document.documentElement.style.setProperty("--theme-primary-rgb", hexToRgb(themeColor));
-    document.documentElement.style.setProperty(
-      "--theme-hover",
-      `color-mix(in srgb, ${themeColor}, black 10%)`
-    );
   }, [themeColor]);
 
   useEffect(() => {
@@ -93,98 +80,27 @@ const App: React.FC = () => {
         setLoading(false);
       }
     };
-
     initData();
   }, []);
-
-  useEffect(() => {
-    const updatePill = () => {
-      const activeTab = tabsRef.current[activeCategory];
-      if (activeTab && navTrackRef.current) {
-        const trackRect = navTrackRef.current.getBoundingClientRect();
-        const tabRect = activeTab.getBoundingClientRect();
-        setNavPillStyle({
-          left: tabRect.left - trackRect.left,
-          width: tabRect.width,
-          opacity: 1,
-        });
-      }
-    };
-
-    const timer = setTimeout(updatePill, 50);
-    window.addEventListener("resize", updatePill);
-
-    return () => {
-      window.removeEventListener("resize", updatePill);
-      clearTimeout(timer);
-    };
-  }, [activeCategory, categories, loading]);
-
-  useEffect(() => {
-    const updateTheme = async () => {
-      if (!loading && themeColorAuto && isBackgroundUrl) {
-        const color = await getDominantColor(background);
-        setThemeColor(color);
-      }
-    };
-    updateTheme();
-  }, [background, loading, themeColorAuto]);
-
-  useEffect(() => {
-    if (!loading && categories.length > 0) {
-      const currentExists = categories.find((c) => c.id === activeCategory);
-      if (!currentExists) setActiveCategory(categories[0].id);
-    }
-  }, [categories, activeCategory, loading]);
-
-  // ------------------ Handlers ------------------
-  const handleUpdateAppearance = async (url: string, opacity: number, color?: string) => {
-    const updatedColor = color || themeColor;
-    setBackground(url);
-    setCardOpacity(opacity);
-    setThemeColor(updatedColor);
-    if (color) setThemeColorAuto(false);
-
-    try {
-      await storageService.setBackground(url);
-      await storageService.savePreferences({
-        cardOpacity: opacity,
-        themeColor: updatedColor,
-        themeMode,
-        themeColorAuto: color ? false : themeColorAuto,
-      }, true);
-    } catch (err) {
-      console.error("Failed to save theme preferences:", err);
-    }
-  };
-
-  const handleUpdateThemeColor = (color: string, auto: boolean) => {
-    setThemeColor(color);
-    setThemeColorAuto(auto);
-    document.documentElement.style.setProperty("--theme-primary", color);
-    storageService.savePreferences({ cardOpacity, themeColor: color, themeMode, themeColorAuto: auto });
-  };
 
   const toggleTheme = () => {
     const newTheme = themeMode === ThemeMode.Dark ? ThemeMode.Light : ThemeMode.Dark;
     setThemeMode(newTheme);
-    storageService.savePreferences({ cardOpacity, themeColor, themeMode: newTheme, themeColorAuto });
   };
 
   const toggleLanguage = () => {
     setLanguage(language === "en" ? "zh" : "en");
   };
 
-  const handleMainCategoryClick = (cat: Category) => {
-    setActiveCategory(cat.id);
-    setActiveSubCategoryId(""); // 取消选择二级分类
+  const handleMainCategoryClick = (catId: string) => {
+    setActiveCategory(catId);
+    setActiveSubCategoryId(""); // 取消二级分类选择
   };
 
   const handleSubCategoryClick = (subId: string) => {
     setActiveSubCategoryId(subId);
   };
 
-  // ------------------ Loading ------------------
   if (loading) {
     return (
       <div className="min-h-screen bg-slate-900 flex items-center justify-center flex-col gap-4">
@@ -196,17 +112,24 @@ const App: React.FC = () => {
     );
   }
 
-  // ------------------ Active Category & SubCategory ------------------
   const activeCat = categories.find(c => c.id === activeCategory);
 
-  // 如果没有选择二级分类，显示所有子分类卡片
+  // 显示卡片逻辑
   let itemsToShow: typeof activeCat.items = [];
+  let displayedSubTitle = "";
   if (activeCat) {
     if (!activeSubCategoryId) {
-      itemsToShow = activeCat.subCategories.flatMap(sub => sub.items);
+      // 主分类点击：显示所有子分类卡片
+      activeCat.subCategories.forEach(sub => {
+        itemsToShow.push(...sub.items);
+      });
     } else {
-      const activeSub = activeCat.subCategories.find(sub => sub.id === activeSubCategoryId);
-      itemsToShow = activeSub ? activeSub.items : [];
+      // 二级分类点击
+      const sub = activeCat.subCategories.find(s => s.id === activeSubCategoryId);
+      if (sub) {
+        itemsToShow = sub.items;
+        displayedSubTitle = sub.title; // 用于显示二级分类名称
+      }
     }
   }
 
@@ -214,74 +137,87 @@ const App: React.FC = () => {
     <div className={`min-h-screen relative overflow-x-hidden selection:bg-[var(--theme-primary)] selection:text-white font-sans flex flex-col ${isDark ? "text-slate-100" : "text-slate-800"}`}>
       <ToastContainer />
 
-      {/* 背景层 */}
+      {/* 背景 */}
       <div className="fixed inset-0 z-0">
         {isBackgroundUrl ? (
-          <img src={background} alt="Background" className="w-full h-full object-cover transition-opacity duration-700" style={{ opacity: isDark ? 0.8 : 1 }} />
+          <img src={background} alt="Background" className="w-full h-full object-cover transition-opacity duration-700" />
         ) : (
-          <div className="w-full h-full transition-opacity duration-700" style={{ background: background, opacity: isDark ? 1 : 0.9 }} />
+          <div className="w-full h-full transition-opacity duration-700" style={{ background }} />
         )}
         <div className={`absolute inset-0 transition-colors duration-500 ${isDark ? "bg-slate-900/30" : "bg-white/10"}`}></div>
       </div>
 
-      {/* -------------------- 灵动岛主导航 -------------------- */}
+      {/* 灵动岛主导航 */}
       <nav className="flex flex-col justify-center items-center py-6 px-4 relative z-[100] isolation-isolate text-sm font-medium tracking-wide">
-        <div className={`relative flex items-center justify-center p-1.5 rounded-full border transition-all duration-500 ${isDark ? "border-white/10 shadow-[0_30px_60px_-15px_rgba(0,0,0,0.7)]" : "border-white/40 shadow-[0_30px_60px_-15px_rgba(0,0,0,0.2)]"}`}>
-          {/* 主分类滑动区域 */}
-          <div ref={navTrackRef} className="relative flex items-center overflow-x-auto no-scrollbar scroll-smooth flex-1 max-w-[calc(100vw-160px)]">
-            <div className={`absolute top-0 bottom-0 rounded-full pointer-events-none transition-all duration-300 ease-[cubic-bezier(0.2,0,0,1)] ${isDark ? "bg-gradient-to-b from-white/25 via-white/10 to-black/20 border border-white/20 shadow-[inset_0_1px_0_rgba(255,255,255,0.25),0_6px_20px_rgba(0,0,0,0.35)]" : "bg-gradient-to-b from-white via-white/70 to-white/40 border border-black/5 shadow-[0_6px_20px_rgba(0,0,0,0.15)]"}`} style={{ left: navPillStyle.left, width: navPillStyle.width, opacity: navPillStyle.opacity, height: "100%" }} />
+        <div className={`relative flex items-center justify-center p-1.5 rounded-full border transition-all duration-500 ${isDark ? "border-white/10" : "border-white/40"}`}>
+          <div className="flex space-x-3">
             {categories.map(cat => {
               const isActive = activeCategory === cat.id;
               return (
-                <div key={cat.id} className="relative flex-shrink-0">
-                  <button ref={el => tabsRef.current[cat.id] = el} onClick={() => handleMainCategoryClick(cat)} className={`relative z-10 flex items-center gap-1.5 px-4 py-2 rounded-full transition-colors duration-300 cursor-pointer select-none active:scale-95 ${isActive ? (isDark ? "text-white font-medium" : "text-slate-900 font-medium") : (isDark ? "text-white/50 hover:text-white/80" : "text-slate-500 hover:text-slate-800")}`}>
-                    <span className="truncate max-w-[100px] relative z-10">{cat.title}</span>
-                    {cat.subCategories.length > 0 && <ChevronDown size={14} className={`relative z-10 transition-transform duration-300 ${isActive ? "rotate-180" : "opacity-50"}`} />}
-                  </button>
-                </div>
+                <button key={cat.id} onClick={() => handleMainCategoryClick(cat.id)} className={`px-4 py-2 rounded-full transition-all duration-200 font-medium ${isActive ? "bg-[var(--theme-primary)] text-white" : isDark ? "text-white/70 hover:text-white/90" : "text-slate-700 hover:text-slate-900"}`}>
+                  {cat.title}
+                </button>
               );
             })}
           </div>
 
-          {/* 右侧操作按钮 */}
           <div className="flex items-center gap-1 ml-2">
-            <button onClick={toggleLanguage} className={`relative flex items-center justify-center p-2.5 rounded-full transition-all duration-200 active:scale-90 hover:bg-[var(--theme-primary)]/20 ${isDark ? "text-white/60" : "text-slate-600"}`}><Globe size={18} /></button>
-            <button onClick={toggleTheme} className={`relative flex items-center justify-center p-2.5 rounded-full transition-all duration-200 active:scale-90 hover:bg-[var(--theme-primary)]/20 ${isDark ? "text-white/60" : "text-slate-600"}`}>{isDark ? <Moon size={18} /> : <Sun size={18} />}</button>
-            <button onClick={() => setIsModalOpen(true)} className={`relative flex items-center justify-center p-2.5 rounded-full transition-all duration-200 active:scale-90 hover:bg-[var(--theme-primary)]/20 ${isDark ? "text-white/60" : "text-slate-600"}`}><Settings size={18} /></button>
+            <button onClick={toggleLanguage}><Globe size={18} /></button>
+            <button onClick={toggleTheme}>{isDark ? <Moon size={18} /> : <Sun size={18} />}</button>
+            <button onClick={() => setIsModalOpen(true)}><Settings size={18} /></button>
           </div>
         </div>
 
-        {/* -------------------- 二级分类显示在主分类下 -------------------- */}
-        <div className="w-full mt-2 flex flex-wrap justify-center gap-2">
-          {activeCat && activeCat.subCategories.map(sub => {
-            const isSubActive = activeSubCategoryId === sub.id;
-            return (
-              <button key={sub.id} onClick={() => handleSubCategoryClick(sub.id)} className={`px-4 py-2 rounded-xl transition-all duration-300 whitespace-nowrap flex items-center gap-2 ${isSubActive ? "bg-[var(--theme-primary)] text-white shadow-lg scale-105 font-bold" : isDark ? "text-white/80 hover:bg-white/10" : "text-slate-800 hover:bg-black/5"}`} style={{ fontSize: "14px" }}>
-                {sub.title}
-                {isSubActive && <div className="w-1.5 h-1.5 rounded-full bg-white animate-pulse" />}
-              </button>
-            );
-          })}
-        </div>
+        {/* 二级分类 */}
+        {activeCat && activeCat.subCategories.length > 0 && (
+          <div className="flex flex-wrap justify-center mt-4 gap-2">
+            {activeCat.subCategories.map(sub => {
+              const isActive = activeSubCategoryId === sub.id;
+              return (
+                <button
+                  key={sub.id}
+                  onClick={() => handleSubCategoryClick(sub.id)}
+                  className={`px-4 py-2 rounded-xl font-semibold transition-all duration-200 ${isActive ? "bg-[var(--theme-primary)] text-white scale-105" : isDark ? "text-white/80 hover:bg-white/10" : "text-slate-800 hover:bg-black/5"}`}
+                  style={{ fontSize: "16px" }} // 二级分类字体大
+                >
+                  {sub.title}
+                </button>
+              );
+            })}
+          </div>
+        )}
       </nav>
 
-      {/* -------------------- 搜索栏 -------------------- */}
+      {/* 搜索栏 */}
       <div className="container mx-auto px-4 flex-1 flex flex-col items-center pt-8 md:pt-12 max-w-[900px] relative z-[10]">
-        <section className="w-full mb-14 animate-fade-in-down relative z-[70] isolation-isolate">
+        <section className="w-full mb-6 relative z-[70]">
           <SearchBar themeMode={themeMode} />
         </section>
 
-        {/* -------------------- 卡片显示 -------------------- */}
+        {/* 二级分类标题显示在卡片上方 */}
+        {displayedSubTitle && (
+          <h2 className="w-full text-left text-lg font-bold mb-2 px-2">{displayedSubTitle}</h2>
+        )}
+
+        {/* 卡片 */}
         <main className="w-full pb-20 relative z-[10] space-y-8">
           {itemsToShow.length > 0 ? (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mt-4">
               {itemsToShow.map(link => (
-                <GlassCard key={link.id} title={link.description ? `站点：${link.title}\n链接：${link.url}\n简介：${link.description}` : `站点：${link.title}\n链接：${link.url}`} hoverEffect={true} opacity={cardOpacity} themeMode={themeMode} onClick={() => window.open(link.url, "_blank")} className="h-20 flex flex-row items-center px-5 gap-5 group animate-card-enter" style={{ animationFillMode: 'backwards' }}>
-                  <div className={`flex-shrink-0 transition-transform duration-300 group-hover:scale-110 flex items-center justify-center h-9 w-9 ${isDark ? "text-white/90" : "text-slate-700"}`}>
+                <GlassCard
+                  key={link.id}
+                  title={link.description ? `站点：${link.title}\n链接：${link.url}\n简介：${link.description}` : `站点：${link.title}\n链接：${link.url}`}
+                  hoverEffect={true}
+                  opacity={cardOpacity}
+                  themeMode={themeMode}
+                  onClick={() => window.open(link.url, "_blank")}
+                  className="h-20 flex flex-row items-center px-5 gap-5"
+                >
+                  <div className={`flex-shrink-0 flex items-center justify-center h-9 w-9`}>
                     <SmartIcon icon={link.icon} size={36} imgClassName="w-9 h-9 object-contain drop-shadow-md rounded-lg" />
                   </div>
                   <div className="flex flex-col items-start overflow-hidden">
-                    <span className={`text-[16px] font-bold truncate w-full transition-colors duration-300 ${isDark ? "text-white group-hover:text-[var(--theme-primary)]" : "text-slate-800"}`}>
+                    <span className={`text-[16px] font-bold truncate w-full`}>
                       {link.title}
                     </span>
                   </div>
@@ -295,11 +231,26 @@ const App: React.FC = () => {
             </div>
           )}
         </main>
+
+        {/* 页脚 */}
+        <footer className="w-full text-center text-sm py-6 text-slate-500">
+          © 2026 Your Dashboard
+        </footer>
       </div>
 
       <SyncIndicator />
-
-      <LinkManagerModal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} categories={categories} setCategories={setCategories} background={background} prefs={{ cardOpacity, themeColor, themeMode, themeColorAuto }} onUpdateAppearance={handleUpdateAppearance} onUpdateTheme={handleUpdateThemeColor} isDefaultCode={isDefaultCode} />
+      <ConsoleLog />
+      <LinkManagerModal
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+        categories={categories}
+        setCategories={setCategories}
+        background={background}
+        prefs={{ cardOpacity, themeColor, themeMode, themeColorAuto }}
+        onUpdateAppearance={(url, opacity, color) => { }}
+        onUpdateTheme={(color, auto) => { }}
+        isDefaultCode={isDefaultCode}
+      />
     </div>
   );
 };
