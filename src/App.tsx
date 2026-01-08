@@ -605,66 +605,80 @@ ${
     style={{ backgroundColor: 'var(--theme-primary)' }}
   ></div> */}
 </div>
-        <main className="w-full pb-20 relative z-[10] space-y-8">
-  {visibleCategory ? (
-    <div key={activeCategory}>
-      {/* 动态计算并排序所有链接 */}
-      {(() => {
-        // 1. 扁平化当前主分类下所有二级分类的链接，并打上来源标记
-        const allLinks = visibleCategory.subCategories.flatMap(sub => 
-          sub.items.map(item => ({ ...item, parentSubId: sub.id }))
-        );
+        
 
-        // 2. 根据 activeSubCategoryId 进行排序：选中的排在最前面
-        const sortedLinks = [...allLinks].sort((a, b) => {
-          if (a.parentSubId === activeSubCategoryId) return -1;
-          if (b.parentSubId === activeSubCategoryId) return 1;
+<main className="w-full pb-20 relative z-[10] space-y-12">
+  {visibleCategory ? (
+    <div key={activeCategory} className="space-y-12">
+      {/* 逻辑：
+         1. 将 subCategories 数组重新排序，把选中的 subId 排在第一位
+         2. 依次渲染每个 subCategory 块
+      */}
+      {(() => {
+        const sortedSubCats = [...visibleCategory.subCategories].sort((a, b) => {
+          if (a.id === activeSubCategoryId) return -1;
+          if (b.id === activeSubCategoryId) return 1;
           return 0;
         });
 
-        if (allLinks.length === 0) {
-          return (
-            <div className={`text-center py-16 flex flex-col items-center gap-3 ${isDark ? "text-white/20" : "text-slate-400"}`}>
-              <FolderOpen size={40} strokeWidth={1} />
-              <p className="text-sm">{t("no_links")}</p>
-            </div>
-          );
-        }
+        return sortedSubCats.map((sub) => (
+          <div 
+            key={sub.id} 
+            id={`sub-section-${sub.id}`}
+            className={`transition-all duration-700 ${
+              sub.id === activeSubCategoryId ? "translate-y-0 opacity-100" : "opacity-90"
+            }`}
+          >
+            {/* 子分类标题分割线 (仅在非 Default 或 多个子分类时显示) */}
+            {(sub.title !== "Default" || visibleCategory.subCategories.length > 1) && (
+              <div className="flex items-center gap-6 mb-8 mt-4">
+                <div className={`h-[2px] w-8 bg-gradient-to-r from-transparent ${
+                  sub.id === activeSubCategoryId ? "to-[var(--theme-primary)] w-16" : (isDark ? "to-white/20" : "to-slate-400/30")
+                } transition-all duration-500`}></div>
+                
+                <h3 className={`text-lg font-black tracking-tight px-4 py-1.5 rounded-lg transition-all duration-300 ${
+                  sub.id === activeSubCategoryId 
+                    ? "text-[var(--theme-primary)] scale-110" 
+                    : (isDark ? "text-white/40" : "text-slate-400")
+                }`}>
+                  {sub.title}
+                </h3>
+                
+                <div className={`h-[2px] flex-1 bg-gradient-to-l from-transparent ${
+                  sub.id === activeSubCategoryId ? "to-[var(--theme-primary)]" : (isDark ? "to-white/20" : "to-slate-400/30")
+                } transition-all duration-500`}></div>
+              </div>
+            )}
 
-        return (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-            {sortedLinks.map((link) => {
-              const isHighlighted = link.parentSubId === activeSubCategoryId;
-              return (
+            {/* 该子分类下的网格布局 */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+              {sub.items.map((link) => (
                 <GlassCard
                   key={link.id}
-                  title={link.description ? `站点：${link.title}\n链接：${link.url}\n简介：${link.description}` : `站点：${link.title}\n链接：${link.url}`}
+                  title={link.description || link.title}
                   hoverEffect={true}
                   opacity={cardOpacity}
                   themeMode={themeMode}
                   onClick={() => window.open(link.url, "_blank")}
-                  // 增加高亮样式：如果是选中的二级分类，增加边框发光感
-                  className={`h-20 flex flex-row items-center px-5 gap-5 group animate-card-enter transition-all duration-500 ${
-                    isHighlighted 
-                    ? "ring-2 ring-[var(--theme-primary)] shadow-[0_0_15px_rgba(var(--theme-primary-rgb),0.3)]" 
-                    : "opacity-80 hover:opacity-100"
+                  className={`h-20 flex flex-row items-center px-5 gap-5 group animate-card-enter border-transparent transition-all duration-500 ${
+                    sub.id === activeSubCategoryId 
+                    ? "ring-1 ring-[var(--theme-primary)]/30 bg-[var(--theme-primary)]/5" 
+                    : ""
                   }`}
-                  style={{ animationFillMode: 'backwards' }}
                 >
                   <div className={`flex-shrink-0 transition-transform duration-300 group-hover:scale-110 flex items-center justify-center h-9 w-9 ${isDark ? "text-white/90" : "text-slate-700"}`}>
                     <SmartIcon icon={link.icon} size={36} imgClassName="w-9 h-9 object-contain drop-shadow-md rounded-lg" />
                   </div>
-
                   <div className="flex flex-col items-start overflow-hidden">
                     <span className={`text-[16px] font-bold truncate w-full transition-colors duration-300 ${isDark ? "text-white group-hover:text-[var(--theme-primary)]" : "text-slate-800"}`}>
                       {link.title}
                     </span>
                   </div>
                 </GlassCard>
-              );
-            })}
+              ))}
+            </div>
           </div>
-        );
+        ));
       })()}
     </div>
   ) : (
@@ -672,8 +686,7 @@ ${
       No categories found.
     </div>
   )}
-</main>
-	</div>
+</main>	</div>
 
       <SyncIndicator />
 
