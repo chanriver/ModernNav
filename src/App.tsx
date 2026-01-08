@@ -715,10 +715,6 @@ ${
         </div>
       )}
     </div>
-  ) : (
-    <div className={`text-center py-12 ${isDark ? "text-white/30" : "text-slate-400"}`}>
-      No sub-categories found.
-    </div>
   )}
 </main>
 	</div>
