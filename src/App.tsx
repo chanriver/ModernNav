@@ -466,68 +466,54 @@ ${
       </div>
 
       {/* Navigation - Dynamic Island */}
-{/* Navigation - Dynamic Island */}
-<nav className="flex flex-col justify-center items-center py-6 px-4 relative z-[100] isolation-isolate text-sm font-medium tracking-wide">
+      <nav className="flex flex-col justify-center items-center py-6 px-4 relative z-[100] isolation-isolate text-sm font-medium tracking-wide">
   {/* 第一行：灵动岛主导航容器 */}
   <div className={islandContainerClass} style={islandStyle}>
     {glassLayerNoise}
     {glassLayerRim}
     {glassLayerSheen}
 
-    <div className="relative z-10 flex flex-col gap-2 w-full max-w-full px-1">
-      {/* 主分类滚动区域 */}
+    <div className="relative z-10 flex items-center gap-1 flex-wrap justify-center max-w-full px-1">
+      {/* SECTION 1: Categories (主分类滑动区域) */}
       <div 
-        className="relative flex overflow-x-auto no-scrollbar scroll-smooth gap-2"
-        style={{ WebkitOverflowScrolling: 'touch' }}
+        ref={navTrackRef}
+        className="relative flex items-center overflow-x-auto no-scrollbar scroll-smooth flex-1"
+        style={{ 
+          maxWidth: 'calc(100vw - 160px)', 
+          WebkitOverflowScrolling: 'touch' 
+        }}
       >
+        {/* 活动分类的背景滑块 */}
+        <div 
+          className={slidingPillClass} 
+          style={{ 
+            left: navPillStyle.left, 
+            width: navPillStyle.width, 
+            opacity: navPillStyle.opacity, 
+            height: "100%" 
+          }} 
+        />
+        
         {categories.map((cat) => {
           const isActive = activeCategory === cat.id;
-          const hasSub = cat.subCategories.length > 0;
+          // 检查是否只有默认子分类
+          const hasSingleDefault = cat.subCategories.length === 1 && cat.subCategories[0].title === "Default";
 
           return (
-            <div key={cat.id} className="flex flex-col flex-shrink-0">
-              {/* 主分类按钮 */}
+            <div key={cat.id} className="relative flex-shrink-0">
               <button
                 ref={(el) => { tabsRef.current[cat.id] = el; }}
                 onClick={() => handleMainCategoryClick(cat)}
                 className={`${categoryButtonBase} ${categoryButtonColors(isActive)} whitespace-nowrap`}
               >
-                <span className="truncate max-w-[100px]">{cat.title}</span>
-                {hasSub && (
-                  <ChevronDown
-                    size={14}
-                    className={`transition-transform duration-300 ${
-                      isActive ? "rotate-180" : "opacity-50"
-                    }`}
+                <span className="truncate max-w-[100px] relative z-10">{cat.title}</span>
+                {!hasSingleDefault && (
+                  <ChevronDown 
+                    size={14} 
+                    className={`relative z-10 transition-transform duration-300 ${isActive ? "rotate-180" : "opacity-50"}`} 
                   />
                 )}
               </button>
-
-              {/* 二级分类：直接显示在主分类下 */}
-              {isActive && hasSub && (
-                <div
-                  className={`mt-2 flex flex-col min-w-[160px] rounded-xl p-1.5 shadow-xl ${dropdownClasses}`}
-                >
-                  {cat.subCategories.map((sub) => {
-                    const isSubActive = activeSubCategoryId === sub.id;
-                    return (
-                      <button
-                        key={sub.id}
-                        onClick={() => handleSubCategoryClick(cat.id, sub.id)}
-                        className={`w-full text-left px-3 py-2 rounded-lg text-sm md:text-base font-semibold transition-all ${
-                          isSubActive
-                            ? "bg-[var(--theme-primary)] text-white"
-                            : isDark
-                            ? "text-white/80 hover:bg-white/10"
-                            : "text-slate-700 hover:bg-black/5"
-                        }`}
-                      >
-                        {sub.title}
-                      </button>
-                    );
-                  })}
-                </div>
-              )}
             </div>
           );
         })}
@@ -550,7 +536,43 @@ ${
     </div>
   </div>
 
-  
+  {/* --- 第二行：二级菜单 (当选中分类有多个子分类时显示) --- */}
+  {(() => {
+    const activeCat = categories.find(c => c.id === activeCategory);
+    // 只有当子分类数量大于 1，或者唯一的子分类不是 "Default" 时才显示
+    const shouldShowSub = activeCat && (
+      activeCat.subCategories.length > 1 || 
+      (activeCat.subCategories.length === 1 && activeCat.subCategories[0].title !== "Default")
+    );
+
+    if (!shouldShowSub) return null;
+
+    return (
+      <div className="w-full max-w-[95vw] mt-4 animate-fade-in md:absolute md:top-[calc(100%-8px)] md:w-auto">
+        <div className={`${dropdownClasses} rounded-2xl p-1.5 flex flex-row flex-wrap md:flex-nowrap justify-center items-center gap-1.5 shadow-2xl ring-1 ring-white/5 overflow-x-auto no-scrollbar`}>
+          {activeCat.subCategories.map((sub) => {
+            const isSubActive = activeSubCategoryId === sub.id;
+            return (
+              <button
+                key={sub.id}
+                onClick={() => handleSubCategoryClick(activeCategory, sub.id)}
+                className={`
+                  px-4 py-2 rounded-xl text-xs transition-all duration-300 whitespace-nowrap flex items-center gap-2
+                  ${isSubActive 
+                    ? "bg-[var(--theme-primary)] text-white shadow-lg scale-105 font-bold" 
+                    : isDark ? "text-white/60 hover:bg-white/10" : "text-slate-600 hover:bg-black/5"
+                  }
+                `}
+              >
+                <span>{sub.title}</span>
+                {isSubActive && <div className="w-1.5 h-1.5 rounded-full bg-white animate-pulse" />}
+              </button>
+            );
+          })}
+        </div>
+      </div>
+    );
+  })()}
 </nav>
 
       <div className="container mx-auto px-4 flex-1 flex flex-col items-center pt-8 md:pt-12 max-w-[900px] relative z-[10]">
@@ -584,7 +606,7 @@ ${
   ></div> */}
 </div>
         <main className="w-full pb-20 relative z-[10] space-y-8">
-  {activeSubCategoryId ? (
+  {visibleSubCategory ? (
     <div key={visibleSubCategory.id}>
       {/* 分类标题分割线 */}
       {/* 分类标题分割线区域 */}
@@ -613,8 +635,6 @@ ${
   {/* 右侧装饰线 */}
   <div className={`h-[2px] flex-1 bg-gradient-to-l from-transparent ${isDark ? "to-white/30" : "to-slate-400/40"}`}></div>
 </div>
-
-
 
       {/* 修改后的网格布局：手机1列，平板2列，电脑4列 */}
       <div 
@@ -691,8 +711,8 @@ ${
 <footer
   className={`relative z-10 py-5 text-center flex justify-center items-center border-t backdrop-blur-sm transition-all duration-500 ${
     isDark
-      ? "border-white/10 bg-black/20 text-white"
-      : "border-black/10 bg-white/40 text-slate-900"
+      ? "border-white/5 bg-black/10 text-white"
+      : "border-black/5 bg-white/10 text-slate-900"
   }`}
 >
   {/* --- 绝对定位：左侧诗句 --- */}
@@ -704,34 +724,39 @@ ${
       fontFamily: '"STKaiti", "Kaiti SC", "楷体", "KaiTi", serif', 
       fontSize: '32px', 
       fontWeight: '900',
-      right: 'calc(50% + 400px)', 
+      right: 'calc(50% + 380px)', 
       whiteSpace: 'nowrap'
     }}
   >
     宠辱不惊，看庭前花开花落
   </div>
 
-  {/* --- 中间内容：单行、高亮、高反差 --- */}
-  <div className="relative z-20 flex flex-row items-center gap-4 whitespace-nowrap font-bold" style={{ fontSize: '13px' }}>
-    {/* 友情链接与关于我们 */}
-    <div className="flex items-center gap-4">
-      <a href="https://nav.361026.xyz" target="_blank" className="hover:text-[var(--theme-primary)] transition-colors flex items-center gap-1.5">
-        <LinkIcon size={14} /> {t("friendly_links")}
+  {/* --- 中间版权：通过描边强化清晰度 --- */}
+  <div className="relative z-20 flex flex-col items-center gap-1.5 min-w-[400px]">
+    <div className="flex gap-5 items-center font-bold" style={{ fontSize: '13px' }}>
+      <a href="https://nav.361026.xyz" target="_blank" className="hover:text-[var(--theme-primary)] transition-colors flex items-center gap-1">
+        <LinkIcon size={13} /> {t("friendly_links")}
       </a>
-      <a href="https://github.com/chanriver" target="_blank" className="hover:text-[var(--theme-primary)] transition-colors flex items-center gap-1.5">
-        <Github size={14} /> {t("about_us")}
+      <span className="opacity-20">|</span>
+      <a href="https://github.com/chanriver" target="_blank" className="hover:text-[var(--theme-primary)] transition-colors flex items-center gap-1">
+        <Github size={13} /> {t("about_us")}
       </a>
     </div>
 
-    {/* 分隔线 */}
-    <span className={`w-[1px] h-3 ${isDark ? "bg-white/40" : "bg-black/20"}`}></span>
-
-    {/* 版权信息：单行呈现 */}
-    <div className="flex items-center gap-1.5">
+    <div 
+      className="flex items-center gap-2 font-bold" 
+      style={{ 
+        fontSize: '12px',
+        // 关键：给文字加描边，确保在任何背景下都清晰
+        WebkitTextStroke: isDark ? '0.2px rgba(0,0,0,0.5)' : '0.2px rgba(255,255,255,0.8)'
+      }}
+    >
       <span>{t("copyright")} © {new Date().getFullYear()} <span className="text-[var(--theme-primary)]">ModernNav</span></span>
-      <span className="opacity-40">|</span>
-      <span>{t("powered_by")}</span>
-      <a href="https://github.com/chanriver/ModernNav" target="_blank" className="hover:underline hover:text-[var(--theme-primary)]">Chanriver</a>
+      <span className="opacity-30">|</span>
+      <span>
+        {t("powered_by")} 
+        <a href="https://github.com/chanriver/ModernNav" target="_blank" className="ml-1 hover:underline">Chanriver</a>
+      </span>
     </div>
   </div>
 
@@ -744,7 +769,7 @@ ${
       fontFamily: '"STKaiti", "Kaiti SC", "楷体", "KaiTi", serif', 
       fontSize: '32px', 
       fontWeight: '900',
-      left: 'calc(50% + 400px)', 
+      left: 'calc(50% + 380px)', 
       whiteSpace: 'nowrap',
       animationDelay: '3.5s'
     }}
