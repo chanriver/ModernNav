@@ -709,97 +709,67 @@ ${
       <SyncIndicator />
 
 <footer
-  className={`relative z-10 py-6 text-center flex flex-col justify-center items-center border-t backdrop-blur-md transition-all duration-500 ${
+  className={`relative z-10 py-5 text-center flex justify-center items-center border-t backdrop-blur-sm transition-all duration-500 ${
     isDark
-      ? "border-white/10 bg-black/40"
-      : "border-black/5 bg-white/40"
+      ? "border-white/5 bg-black/10 text-white"
+      : "border-black/5 bg-white/10 text-slate-900"
   }`}
 >
   {/* --- 绝对定位：左侧诗句 --- */}
   <div 
     className={`hidden lg:block absolute transition-all duration-1000 animate-[pulse_7s_infinite] pointer-events-none ${
-      isDark 
-        ? "text-white [text-shadow:0_0_25px_rgba(0,0,0,1)]" 
-        : "text-slate-900 [text-shadow:0_0_25px_rgba(255,255,255,1)]"
+      isDark ? "[text-shadow:0_0_20px_rgba(0,0,0,1)]" : "[text-shadow:0_0_20px_rgba(255,255,255,1)]"
     }`}
     style={{ 
       fontFamily: '"STKaiti", "Kaiti SC", "楷体", "KaiTi", serif', 
       fontSize: '32px', 
       fontWeight: '900',
-      right: 'calc(50% + 340px)', 
-      whiteSpace: 'nowrap',
+      right: 'calc(50% + 380px)', 
+      whiteSpace: 'nowrap'
     }}
   >
     宠辱不惊，看庭前花开花落
   </div>
 
-  {/* --- 中间内容区域：深度优化显示 --- */}
-  <div className={`
-    relative z-20 flex flex-col items-center gap-3 px-8 py-3 rounded-2xl
-    ${isDark ? "bg-white/5 shadow-[0_0_20px_rgba(0,0,0,0.2)]" : "bg-black/5 shadow-sm"}
-  `}>
-    {/* 上排：链接信息 */}
-    <div className="flex gap-6 items-center">
-      <a
-        href="https://nav.361026.xyz"
-        target="_blank"
-        rel="noopener noreferrer"
-        className={`flex items-center gap-1.5 transition-all font-bold hover:scale-110 ${
-          isDark ? "text-white/90 hover:text-[var(--theme-primary)]" : "text-slate-800 hover:text-[var(--theme-primary)]"
-        }`}
-        style={{ fontSize: '13px' }}
-      >
-        <LinkIcon size={14} /> {t("friendly_links")}
+  {/* --- 中间版权：通过描边强化清晰度 --- */}
+  <div className="relative z-20 flex flex-col items-center gap-1.5 min-w-[400px]">
+    <div className="flex gap-5 items-center font-bold" style={{ fontSize: '13px' }}>
+      <a href="https://nav.361026.xyz" target="_blank" className="hover:text-[var(--theme-primary)] transition-colors flex items-center gap-1">
+        <LinkIcon size={13} /> {t("friendly_links")}
       </a>
-      <div className={`w-1 h-1 rounded-full ${isDark ? "bg-white/20" : "bg-black/20"}`} />
-      <a
-        href="https://github.com/chanriver"
-        target="_blank"
-        rel="noopener noreferrer"
-        className={`flex items-center gap-1.5 transition-all font-bold hover:scale-110 ${
-          isDark ? "text-white/90 hover:text-[var(--theme-primary)]" : "text-slate-800 hover:text-[var(--theme-primary)]"
-        }`}
-        style={{ fontSize: '13px' }}
-      >
-        <Github size={14} /> {t("about_us")}
+      <span className="opacity-20">|</span>
+      <a href="https://github.com/chanriver" target="_blank" className="hover:text-[var(--theme-primary)] transition-colors flex items-center gap-1">
+        <Github size={13} /> {t("about_us")}
       </a>
     </div>
 
-    {/* 下排：版权信息 */}
-    <div className={`flex flex-col md:flex-row items-center gap-2 font-medium ${
-      isDark ? "text-white/80" : "text-slate-900"
-    }`} style={{ fontSize: '12px', letterSpacing: '0.02em' }}>
-      <p className="flex items-center gap-1">
-        {t("copyright")} © {new Date().getFullYear()} 
-        <span className="font-black tracking-wider text-[var(--theme-primary)]">ModernNav</span>
-      </p>
-      <span className="hidden md:inline opacity-30">|</span>
-      <p className="flex items-center gap-1">
-        <span className="opacity-60">{t("powered_by")}</span>
-        <a
-          href="https://github.com/chanriver/ModernNav"
-          target="_blank"
-          rel="noopener noreferrer"
-          className="font-black border-b border-current hover:text-[var(--theme-primary)] transition-colors"
-        >
-          Chanriver
-        </a>
-      </p>
+    <div 
+      className="flex items-center gap-2 font-bold" 
+      style={{ 
+        fontSize: '12px',
+        // 关键：给文字加描边，确保在任何背景下都清晰
+        WebkitTextStroke: isDark ? '0.2px rgba(0,0,0,0.5)' : '0.2px rgba(255,255,255,0.8)'
+      }}
+    >
+      <span>{t("copyright")} © {new Date().getFullYear()} <span className="text-[var(--theme-primary)]">ModernNav</span></span>
+      <span className="opacity-30">|</span>
+      <span>
+        {t("powered_by")} 
+        <a href="https://github.com/chanriver/ModernNav" target="_blank" className="ml-1 hover:underline">Chanriver</a>
+      </span>
     </div>
   </div>
 
   {/* --- 绝对定位：右侧诗句 --- */}
   <div 
     className={`hidden lg:block absolute transition-all duration-1000 animate-[pulse_7s_infinite] pointer-events-none ${
-      isDark 
-        ? "text-white [text-shadow:0_0_25px_rgba(0,0,0,1)]" 
-        : "text-slate-900 [text-shadow:0_0_25px_rgba(255,255,255,1)]"
+      isDark ? "[text-shadow:0_0_20px_rgba(0,0,0,1)]" : "[text-shadow:0_0_20px_rgba(255,255,255,1)]"
     }`}
     style={{ 
       fontFamily: '"STKaiti", "Kaiti SC", "楷体", "KaiTi", serif', 
       fontSize: '32px', 
       fontWeight: '900',
-      left: 'calc(50% + 340px)', 
+      left: 'calc(50% + 380px)', 
       whiteSpace: 'nowrap',
       animationDelay: '3.5s'
     }}
