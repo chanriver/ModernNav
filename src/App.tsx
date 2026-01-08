@@ -466,101 +466,71 @@ ${
       </div>
 
       {/* Navigation - Dynamic Island */}
-      <nav className="flex flex-col justify-center items-center py-6 px-4 relative z-[100] isolation-isolate text-sm font-medium tracking-wide">
+{/* Navigation - Dynamic Island */}
+<nav className="flex flex-col justify-center items-center py-6 px-4 relative z-[100] isolation-isolate text-sm font-medium tracking-wide">
   {/* 第一行：灵动岛主导航容器 */}
   <div className={islandContainerClass} style={islandStyle}>
     {glassLayerNoise}
     {glassLayerRim}
     {glassLayerSheen}
 
-    <div className="relative z-10 flex items-center gap-1 flex-wrap justify-center max-w-full px-1">
-      {/* SECTION 1: Categories (主分类滑动区域) */}
+    <div className="relative z-10 flex flex-col gap-2 w-full max-w-full px-1">
+      {/* 主分类滚动区域 */}
       <div 
-        ref={navTrackRef}
-        className="relative flex items-center overflow-x-auto no-scrollbar scroll-smooth flex-1"
-        style={{ 
-          maxWidth: 'calc(100vw - 160px)', 
-          WebkitOverflowScrolling: 'touch' 
-        }}
+        className="relative flex overflow-x-auto no-scrollbar scroll-smooth gap-2"
+        style={{ WebkitOverflowScrolling: 'touch' }}
       >
-        {/* 活动分类的背景滑块 */}
-        <div 
-          className={slidingPillClass} 
-          style={{ 
-            left: navPillStyle.left, 
-            width: navPillStyle.width, 
-            opacity: navPillStyle.opacity, 
-            height: "100%" 
-          }} 
-        />
-        
-       {categories.map((cat) => {
-  const isActive = activeCategory === cat.id;
-  const hasSub =
-    cat.subCategories.length > 1 ||
-    (cat.subCategories.length === 1 && cat.subCategories[0].title !== "Default");
+        {categories.map((cat) => {
+          const isActive = activeCategory === cat.id;
+          const hasSub = cat.subCategories.length > 0;
 
-  return (
-    <div key={cat.id} className="relative flex-shrink-0">
-      {/* 主分类按钮 */}
-      <button
-        ref={(el) => {
-          tabsRef.current[cat.id] = el;
-        }}
-        onClick={() => handleMainCategoryClick(cat)}
-        className={`${categoryButtonBase} ${categoryButtonColors(isActive)} whitespace-nowrap`}
-      >
-        <span className="truncate max-w-[100px]">{cat.title}</span>
-        {hasSub && (
-          <ChevronDown
-            size={14}
-            className={`transition-transform duration-300 ${
-              isActive ? "rotate-180" : "opacity-50"
-            }`}
-          />
-        )}
-      </button>
-
-      {/* ✅ 二级分类：直接挂在主分类下面 */}
-      {isActive && hasSub && (
-        <div
-          className={`
-            absolute left-1/2 -translate-x-1/2 mt-2
-            min-w-[180px]
-            rounded-xl p-2
-            shadow-xl z-[200]
-            ${dropdownClasses}
-          `}
-        >
-          {cat.subCategories.map((sub) => {
-            const isSubActive = activeSubCategoryId === sub.id;
-            return (
+          return (
+            <div key={cat.id} className="flex flex-col flex-shrink-0">
+              {/* 主分类按钮 */}
               <button
-                key={sub.id}
-                onClick={() => handleSubCategoryClick(cat.id, sub.id)}
-                className={`
-                  w-full text-left px-4 py-2 rounded-lg
-                  text-sm md:text-base font-semibold
-                  transition-all
-                  ${
-                    isSubActive
-                      ? "bg-[var(--theme-primary)] text-white"
-                      : isDark
-                      ? "text-white/80 hover:bg-white/10"
-                      : "text-slate-700 hover:bg-black/5"
-                  }
-                `}
+                ref={(el) => { tabsRef.current[cat.id] = el; }}
+                onClick={() => handleMainCategoryClick(cat)}
+                className={`${categoryButtonBase} ${categoryButtonColors(isActive)} whitespace-nowrap`}
               >
-                {sub.title}
+                <span className="truncate max-w-[100px]">{cat.title}</span>
+                {hasSub && (
+                  <ChevronDown
+                    size={14}
+                    className={`transition-transform duration-300 ${
+                      isActive ? "rotate-180" : "opacity-50"
+                    }`}
+                  />
+                )}
               </button>
-            );
-          })}
-        </div>
-      )}
-    </div>
-  );
-})}
 
+              {/* 二级分类：直接显示在主分类下 */}
+              {isActive && hasSub && (
+                <div
+                  className={`mt-2 flex flex-col min-w-[160px] rounded-xl p-1.5 shadow-xl ${dropdownClasses}`}
+                >
+                  {cat.subCategories.map((sub) => {
+                    const isSubActive = activeSubCategoryId === sub.id;
+                    return (
+                      <button
+                        key={sub.id}
+                        onClick={() => handleSubCategoryClick(cat.id, sub.id)}
+                        className={`w-full text-left px-3 py-2 rounded-lg text-sm md:text-base font-semibold transition-all ${
+                          isSubActive
+                            ? "bg-[var(--theme-primary)] text-white"
+                            : isDark
+                            ? "text-white/80 hover:bg-white/10"
+                            : "text-slate-700 hover:bg-black/5"
+                        }`}
+                      >
+                        {sub.title}
+                      </button>
+                    );
+                  })}
+                </div>
+              )}
+            </div>
+          );
+        })}
       </div>
 
       {/* SECTION 2 & 3: 分隔线与全局操作按钮 */}
