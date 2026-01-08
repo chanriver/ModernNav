@@ -548,7 +548,7 @@ ${
     if (!shouldShowSub) return null;
 
     return (
-      <div className="w-full max-w-[95vw] mt-4 animate-fade-in md:absolute md:top-[calc(100%-8px)] md:w-auto">
+      <div className="w-full max-w-[95vw] mt-4 animate-fade-in">
         <div className={`${dropdownClasses} rounded-2xl p-1.5 flex flex-row flex-wrap md:flex-nowrap justify-center items-center gap-1.5 shadow-2xl ring-1 ring-white/5 overflow-x-auto no-scrollbar`}>
           {activeCat.subCategories.map((sub) => {
             const isSubActive = activeSubCategoryId === sub.id;
@@ -556,13 +556,17 @@ ${
               <button
                 key={sub.id}
                 onClick={() => handleSubCategoryClick(activeCategory, sub.id)}
-                className={`
-                  px-4 py-2 rounded-xl text-xs transition-all duration-300 whitespace-nowrap flex items-center gap-2
-                  ${isSubActive 
-                    ? "bg-[var(--theme-primary)] text-white shadow-lg scale-105 font-bold" 
-                    : isDark ? "text-white/60 hover:bg-white/10" : "text-slate-600 hover:bg-black/5"
-                  }
-                `}
+               className={`
+  		  px-5 py-2.5 rounded-xl
+  		  text-sm md:text-base font-semibold
+  		  transition-all duration-300 whitespace-nowrap
+  		${isSubActive 
+    		? "bg-[var(--theme-primary)] text-white shadow-lg scale-105" 
+   		 : isDark
+     		 ? "text-white/80 hover:bg-white/10"
+    		  : "text-slate-700 hover:bg-black/5"
+  		}
+		`}
               >
                 <span>{sub.title}</span>
                 {isSubActive && <div className="w-1.5 h-1.5 rounded-full bg-white animate-pulse" />}
@@ -606,7 +610,7 @@ ${
   ></div> */}
 </div>
         <main className="w-full pb-20 relative z-[10] space-y-8">
-  {visibleSubCategory ? (
+  {activeSubCategoryId ? (
     <div key={visibleSubCategory.id}>
       {/* 分类标题分割线 */}
       {/* 分类标题分割线区域 */}
@@ -635,6 +639,19 @@ ${
   {/* 右侧装饰线 */}
   <div className={`h-[2px] flex-1 bg-gradient-to-l from-transparent ${isDark ? "to-white/30" : "to-slate-400/40"}`}></div>
 </div>
+
+  {/* 情况一：没有选中二级分类 → 显示该主分类下的所有子分类 */}
+  {activeSubCategoryId === "" && visibleCategory?.subCategories.map((sub) => (
+    <div key={sub.id} className="mb-10">
+
+      {/* 子分类标题 */}
+      <div className="flex items-center gap-4 mb-5">
+        <h3 className="text-lg md:text-xl font-black">
+          {sub.title}
+        </h3>
+        <div className="flex-1 h-px bg-white/20"></div>
+      </div>
+
 
       {/* 修改后的网格布局：手机1列，平板2列，电脑4列 */}
       <div 
